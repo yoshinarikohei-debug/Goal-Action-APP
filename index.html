@@ -24,6 +24,20 @@
     .section-title{font-size:20px;font-weight:800;margin-bottom:4px}.section-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
     .status{margin-top:14px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:13px}
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .stat-card{position:relative;overflow:hidden}
+    .stat-card.emphasis{background:#fff;color:#0f172a;border:1px solid #dbe3f0;box-shadow:none}
+    .stat-card.emphasis .stat-icon{background:#eff6ff}
+    .stat-card.emphasis .stat-label,.stat-card.emphasis .stat-sub{color:#64748b}
+    .stat-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+    .stat-trend{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
+    .stat-card:not(.emphasis) .stat-trend{background:#eff6ff;color:#1d4ed8}
+    .stat-progress{margin-top:12px;height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}
+    .stat-card:not(.emphasis) .stat-progress{background:#e2e8f0}
+    .stat-progress-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#93c5fd,#2563eb)}
+    .stat-card:not(.emphasis) .stat-progress-fill{background:linear-gradient(90deg,#60a5fa,#1d4ed8)}
+    .stat-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px;font-size:12px}
+    .stat-card.emphasis .stat-meta{color:#475569}
+    .stat-card:not(.emphasis) .stat-meta{color:#475569}
     .stat-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#e2e8f0;font-size:20px;margin-bottom:12px}.stat-icon.blue{background:#dbeafe}.stat-label{font-size:12px;color:var(--muted);font-weight:700}.stat-value{font-size:28px;font-weight:800;margin-top:6px}.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
     .dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:16px}
     .center-stack{display:grid;gap:14px}
@@ -37,7 +51,7 @@
     .task-form{display:grid;gap:12px;margin-bottom:14px}.task-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.task-form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.task-weekdays{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}.weekday-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:#334155}.weekday-chip input{margin:0}.checkbox-row{display:flex;align-items:center;gap:8px;min-height:46px;padding:0 4px}.task-list{display:grid;gap:10px}.task-item{border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;justify-content:space-between;gap:14px;align-items:center;background:#fff}.task-left{display:grid;gap:6px}.task-title{font-size:15px;font-weight:700}.task-detail{font-size:13px;color:#475569;line-height:1.6}
     .analysis-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px;margin-bottom:20px}.chart-card{border:1px solid var(--line);border-radius:22px;padding:14px;background:#fff}.chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 10px}.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#475569;font-weight:700}.legend-dot{width:10px;height:10px;border-radius:999px;display:inline-block}.bars-wrap{overflow-x:auto;padding-bottom:6px}.bars{min-width:760px;height:240px;display:grid;grid-template-columns:repeat(31,minmax(22px,1fr));align-items:end;gap:8px;padding:10px 0 28px;position:relative}.bars::before,.bars::after{content:'';position:absolute;left:0;right:0;border-top:1px dashed #cbd5e1}.bars::before{top:33%}.bars::after{top:66%}.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:end;gap:8px;height:100%}.bar{width:100%;max-width:28px;border-radius:12px 12px 4px 4px;background:#e2e8f0;min-height:6px;overflow:hidden;display:flex;flex-direction:column-reverse}.bar-segment{width:100%}.bar-label{font-size:10px;color:var(--muted)}.bar-value{font-size:10px;color:#334155;font-weight:700}
     .summary-list{display:grid;gap:10px}.summary-group-title{font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}.summary-group-title:first-child{margin-top:0;padding-top:0;border-top:none}.summary-row{display:grid;grid-template-columns:160px minmax(0,1fr) 52px;gap:10px;align-items:center}.summary-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.summary-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}.summary-fill{height:100%;border-radius:inherit}.summary-count{font-size:12px;color:var(--muted);text-align:right}
-    .execution-grid{display:grid;grid-template-columns:minmax(0,1.6fr) 320px;gap:16px}.action-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+    .execution-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.action-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
     .action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.action-card{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px;cursor:pointer;transition:.2s ease;text-align:left;min-height:120px}.action-card:hover{transform:translateY(-1px)}.action-card.done{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-color:#2563eb;box-shadow:0 8px 18px rgba(37,99,235,.18)}
     .action-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}.action-name{font-size:16px;font-weight:800}.action-detail{font-size:12px;line-height:1.6;opacity:.9;min-height:38px}.action-bottom{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;margin-top:10px}.tag{padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.16)}.tag.off{background:#f1f5f9;color:var(--muted)}
     .focus-box{border-radius:24px;padding:18px;color:#fff;background:var(--primary)} .focus-box .date{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:10px}.focus-box .rate{display:flex;align-items:end;gap:8px;margin:10px 0}.focus-box .rate strong{font-size:58px;line-height:1}.progress-track{width:100%;height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden}.progress-fill{height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);border-radius:inherit}.notice{border-radius:18px;background:#eef2ff;border:1px solid #c7d2fe;padding:14px}.notice h4{font-size:14px;margin-bottom:8px}
@@ -133,7 +147,7 @@
       </div>
       <div class="card">
         <div class="section-title">今日のタスク状況</div>
-        <div class="section-sub">今日使うボタンはここにまとめ、右側に進捗カードを置いています</div>
+        <div class="section-sub">今日使うタスクだけをここにまとめています</div>
         <div class="execution-grid">
           <div>
             <div class="action-head"><div style="font-size:14px;font-weight:800;">タスク一覧</div><div class="counter-chip" id="actionCounter">0 / 15</div></div>
@@ -543,23 +557,30 @@
     const avgProgress = state.goals.length ? Math.round(state.goals.reduce((a,g) => a + calcActionRate(TODAY_STR, g), 0) / state.goals.length) : 0;
     const bestStreak = actions.length ? Math.max(...actions.map(a => calcActionStreak(a.id, goal))) : 0;
     const activeDays = Array.from({length:getDaysInMonth(CURRENT_YEAR,CURRENT_MONTH)}, (_,i)=>i+1).map(day => getDateStr(CURRENT_YEAR,CURRENT_MONTH,day)).filter(ds => getDoneCountForDate(ds, goal) > 0).length;
+    const avgDoneGoals = state.goals.length ? state.goals.filter(g => calcActionRate(TODAY_STR, g) >= avgProgress).length : 0;
     el('stats').innerHTML = [
-      ['📈','blue','今日の達成率',`${todayRate}%`,`${todayDoneCount}/${todayActions.length} タスク`],
-      ['🎯','','平均達成率',`${avgProgress}%`,'全目標の平均'],
-      ['🔥','','最長継続',`${bestStreak}日`,'選択目標の最長継続'],
-      ['📅','','稼働日数',`${activeDays}日`,'今月ログが入った日数']
-    ].map(([emoji,color,label,value,sub]) => `
-      <div class="card">
-        <div class="stat-icon ${color}">${emoji}</div>
-        <div class="stat-label">${label}</div>
+      ['📈','blue','今日の達成率',`${todayRate}%`,`${todayDoneCount}/${todayActions.length} タスク`,'今日やる設定のうち、完了した割合','本日',`${todayRate}%`,true],
+      ['🎯','','平均達成率',`${avgProgress}%`,'全目標の平均','全目標を均した進み具合','全体平均',`${avgDoneGoals}/${state.goals.length || 0} 目標が平均以上`,true],
+      ['🔥','','最長継続',`${bestStreak}日`,'選択目標の最長継続','','','',false],
+      ['📅','','稼働日数',`${activeDays}日`,'今月ログが入った日数','','','',false]
+    ].map(([emoji,color,label,value,sub,metaLeft,metaRight,trend,isEmphasis]) => `
+      <div class="card stat-card ${isEmphasis ? 'emphasis' : ''}">
+        <div class="stat-card-head">
+          <div>
+            <div class="stat-icon ${color}">${emoji}</div>
+            <div class="stat-label">${label}</div>
+          </div>
+          ${isEmphasis ? `<div class="stat-trend">${trend}</div>` : ''}
+        </div>
         <div class="stat-value">${value}</div>
         <div class="stat-sub">${sub}</div>
+        ${isEmphasis ? `<div class="stat-progress"><div class="stat-progress-fill" style="width:${Math.max(0, Math.min(100, Number(value.replace('%','')) || 0))}%"></div></div><div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>` : ''}
       </div>
     `).join('');
-    el('todayDateLabel').textContent = TODAY_STR.replaceAll('-','/');
-    el('todayRateBig').textContent = todayRate;
-    el('todayCountLabel').textContent = `${todayDoneCount} / ${todayActions.length} タスク達成`;
-    el('todayProgressBar').style.width = `${todayRate}%`;
+    const todayDateLabel = el('todayDateLabel'); if(todayDateLabel) todayDateLabel.textContent = TODAY_STR.replaceAll('-','/');
+    const todayRateBig = el('todayRateBig'); if(todayRateBig) todayRateBig.textContent = todayRate;
+    const todayCountLabel = el('todayCountLabel'); if(todayCountLabel) todayCountLabel.textContent = `${todayDoneCount} / ${todayActions.length} タスク達成`;
+    const todayProgressBar = el('todayProgressBar'); if(todayProgressBar) todayProgressBar.style.width = `${todayRate}%`;
     el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
     el('actionCounterInline').textContent = `登録 ${actions.length} / ${ACTION_MAX} 件`;
   }
