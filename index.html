@@ -153,14 +153,7 @@
             <div class="action-head"><div style="font-size:14px;font-weight:800;">タスク一覧</div><div class="counter-chip" id="actionCounter">0 / 15</div></div>
             <div class="action-grid" id="actionGrid"></div>
           </div>
-          <div class="stack">
-            <div class="focus-box">
-              <div class="date">本日</div>
-              <div id="todayDateLabel" class="date" style="font-size:14px;"></div>
-              <div class="rate"><strong id="todayRateBig">0</strong><span style="font-size:20px;padding-bottom:6px;">%</span></div>
-              <div id="todayCountLabel" style="font-size:14px;color:rgba(255,255,255,.85);margin-bottom:12px;"></div>
-              <div class="progress-track"><div class="progress-fill" id="todayProgressBar"></div></div>
-            </div>
+</div>
             </div>
         </div>
       </div>
@@ -576,12 +569,7 @@
         <div class="stat-sub">${sub}</div>
         ${isEmphasis ? `<div class="stat-progress"><div class="stat-progress-fill" style="width:${Math.max(0, Math.min(100, Number(value.replace('%','')) || 0))}%"></div></div><div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>` : ''}
       </div>
-    `).join('');
-    const todayDateLabel = el('todayDateLabel'); if(todayDateLabel) todayDateLabel.textContent = TODAY_STR.replaceAll('-','/');
-    const todayRateBig = el('todayRateBig'); if(todayRateBig) todayRateBig.textContent = todayRate;
-    const todayCountLabel = el('todayCountLabel'); if(todayCountLabel) todayCountLabel.textContent = `${todayDoneCount} / ${todayActions.length} タスク達成`;
-    const todayProgressBar = el('todayProgressBar'); if(todayProgressBar) todayProgressBar.style.width = `${todayRate}%`;
-    el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
+    `).join('');    el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
     el('actionCounterInline').textContent = `登録 ${actions.length} / ${ACTION_MAX} 件`;
   }
 
