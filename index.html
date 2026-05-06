@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Goal-Action APP 安定版 v2</title>
 <style>
-:root{--bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--blue:#2563eb;--green:#059669;--gray:#374151;--amber:#d97706;--red:#dc2626}
+:root{--bg:#f6f7fb;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--blue:#2563eb;--green:#059669;--gray:#374151;--amber:#d97706}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI","Yu Gothic UI",sans-serif}
 .wrap{max-width:1200px;margin:0 auto;padding:20px}
@@ -14,6 +14,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:"Meiryo UI","Yu
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.04)}
 h1{margin:0 0 8px;font-size:24px}
+h2{margin:0 0 12px;font-size:18px}
 .sub{color:var(--muted);margin-bottom:14px}
 .status{padding:12px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8;margin-bottom:16px}
 .kv{display:grid;grid-template-columns:180px 1fr;gap:8px;font-size:14px}
@@ -52,102 +53,3 @@ textarea{min-height:120px;resize:vertical}
           <button id="btnReload" class="btn light">ローカル再読込</button>
           <button id="btnSaveLocal" class="btn green">ローカル保存</button>
           <button id="btnExport" class="btn gray">JSONエクスポート</button>
-          <label for="fileImport" class="btn light" style="display:inline-block;margin:0">JSONインポート</label>
-          <input id="fileImport" type="file" accept="application/json,.json" style="display:none" />
-        </div>
-        <div style="margin-top:12px">
-          <label for="todayNote">今日の一言</label>
-          <textarea id="todayNote"></textarea>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>目標一覧（プレビュー）</h2>
-        <div id="goalList" class="list"></div>
-        <div class="small" style="margin-top:8px">※ 複雑な編集UIは省略。復旧・保存・同期の安定化を優先しています。</div>
-      </div>
-
-      <div class="card">
-        <h2>JSON（上級者向け・直接編集可）</h2>
-        <textarea id="jsonEditor" spellcheck="false"></textarea>
-        <div class="row" style="margin-top:12px">
-          <button id="btnApplyJson" class="btn amber">JSONを反映</button>
-          <button id="btnResetJson" class="btn light">JSONを再読込</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h2>Supabase 設定</h2>
-        <label for="projectUrl">Project URL</label>
-        <input id="projectUrl" type="text" placeholder="https://xxxx.supabase.co" />
-        <div style="margin-top:10px">
-          <label for="anonKey">Anon Key</label>
-          <textarea id="anonKey"></textarea>
-        </div>
-        <div class="row" style="margin-top:12px">
-          <button id="btnSaveConfig" class="btn green">設定を保存</button>
-          <button id="btnTest" class="btn light">接続テスト</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>クラウド同期</h2>
-        <div id="cloudSummary" class="kv"></div>
-        <div class="row" style="margin-top:12px">
-          <button id="btnSync" class="btn blue">今の内容を同期</button>
-          <button id="btnLoadCloud" class="btn gray">クラウドを読み込む</button>
-        </div>
-        <div class="warn" style="margin-top:12px">
-          安全対策：
-          <br>・goals が 0 件の場合は強い警告
-          <br>・同期前に確認ダイアログ
-          <br>・読込前にも確認ダイアログ
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>内部情報</h2>
-        <div class="kv">
-          <div>アプリキー</div><div class="mono">goal-action-kohei-2026</div>
-          <div>同期テーブル</div><div class="mono">app_sync_state</div>
-          <div>バージョン</div><div class="mono">stable-recovery-v2</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-(()=>{'use strict';
-const APP_KEY='goal-action-kohei-2026';
-const CONFIG_KEY='goal-action-sync-config';
-const TABLE='app_sync_state';
-const DEFAULT_DATA={selectedGoalId:null,todayNote:'',goals:[]};
-const $=id=>document.getElementById(id);
-const els={status:$('status'),localSummary:$('localSummary'),cloudSummary:$('cloudSummary'),goalList:$('goalList'),todayNote:$('todayNote'),jsonEditor:$('jsonEditor'),projectUrl:$('projectUrl'),anonKey:$('anonKey'),fileImport:$('fileImport')};
-let state=loadLocal();
-
-function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;")}
-function setStatus(msg,kind='info'){const m={info:['#eff6ff','#bfdbfe','#1d4ed8'],ok:['#ecfdf5','#a7f3d0','#047857'],warn:['#fffbeb','#fde68a','#92400e'],error:['#fef2f2','#fecaca','#991b1b']};const [bg,bd,tx]=m[kind]||m.info;els.status.style.background=bg;els.status.style.border='1px solid '+bd;els.status.style.color=tx;els.status.textContent=msg}
-function fmtTs(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?String(v):d.toLocaleString('ja-JP')}
-function loadLocal(){try{const raw=localStorage.getItem(APP_KEY);if(!raw)return structuredClone(DEFAULT_DATA);const d=JSON.parse(raw);if(!Array.isArray(d.goals))d.goals=[];if(!('todayNote' in d))d.todayNote='';if(!('selectedGoalId' in d))d.selectedGoalId=null;return d}catch(e){setStatus('ローカル読込に失敗: '+e.message,'error');return structuredClone(DEFAULT_DATA)}}
-function saveLocal(note='stable-recovery-v2-local-save'){state.todayNote=els.todayNote.value;state._updatedAt=new Date().toISOString();state._updatedBy=note;state._appVersion='stable-recovery-v2';localStorage.setItem(APP_KEY,JSON.stringify(state));render();setStatus('ローカル保存が完了しました','ok')}
-function loadConfig(){try{return JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}')}catch{return {}}}
-function saveConfig(){const cfg={projectUrl:(els.projectUrl.value||'').trim().replace(/\/+$/,''),anonKey:(els.anonKey.value||'').trim()};if(!cfg.projectUrl)throw new Error('Project URL を入力してください');if(!cfg.anonKey)throw new Error('Anon Key を入力してください');localStorage.setItem(CONFIG_KEY,JSON.stringify(cfg));setStatus('設定を保存しました','ok')}
-function getCfg(){const cfg={projectUrl:(els.projectUrl.value||'').trim().replace(/\/+$/,''),anonKey:(els.anonKey.value||'').trim()};if(!cfg.projectUrl)throw new Error('Project URL を入力してください');if(!cfg.anonKey)throw new Error('Anon Key を入力してください');return cfg}
-async function req(method,path,body){const cfg=getCfg();const res=await fetch(cfg.projectUrl+path,{method,headers:{'apikey':cfg.anonKey,'Authorization':'Bearer '+cfg.anonKey,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=representation'},body:body?JSON.stringify(body):undefined});const text=await res.text();let json;try{json=text?JSON.parse(text):null}catch{json=text}if(!res.ok)throw new Error('HTTP '+res.status+': '+(typeof json==='string'?json:JSON.stringify(json)));return json}
-function render(){const c=Array.isArray(state.goals)?state.goals.length:0;els.localSummary.innerHTML=`<div>goals件数</div><div><span class="pill">${c}</span></div><div>selectedGoalId</div><div class="mono">${esc(state.selectedGoalId||'—')}</div><div>今日の一言</div><div>${esc(state.todayNote||'—')}</div><div>最終更新</div><div>${fmtTs(state._updatedAt)}</div><div>更新者</div><div class="mono">${esc(state._updatedBy||'—')}</div><div>復旧元</div><div class="mono">${esc(state._restoredFrom||'—')}</div>`;els.todayNote.value=state.todayNote||'';els.jsonEditor.value=JSON.stringify(state,null,2);if(!c){els.goalList.innerHTML='<div class="item small">目標がありません</div>'}else{els.goalList.innerHTML=state.goals.map((g,i)=>{const title=g.title||g.name||g.text||('目標 '+(i+1));const id=g.id||'';const cat=g.category||g.type||'';const priority=g.priority||'';const actions=Array.isArray(g.actions)?g.actions.length:(Array.isArray(g.items)?g.items.length:0);return `<div class="item"><div><strong>${esc(title)}</strong></div><div class="small mono">id: ${esc(id||'—')}</div><div class="small">分類: ${esc(cat||'—')} / 優先順位: ${esc(String(priority||'—'))} / アクション数: ${actions}</div></div>`}).join('')}}
-async function testConnection(){setStatus('接続テスト中...','info');await req('GET',`/rest/v1/${TABLE}?select=app_key&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`);setStatus('接続テスト成功','ok')}
-async function fetchCloud(){const rows=await req('GET',`/rest/v1/${TABLE}?select=app_key,payload,updated_at,updated_by,app_version&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`);const row=Array.isArray(rows)?rows[0]:null;if(!row)return null;return {payload:row.payload||{},updatedAt:row.updated_at||'',updatedBy:row.updated_by||'',appVersion:row.app_version||''}}
-async function sync(){const goalsCount=Array.isArray(state.goals)?state.goals.length:0;if(goalsCount===0){if(!confirm('警告: goals が 0 件です。続行しますか？'))return}if(!confirm(`ローカルの内容をクラウドへ同期します。\n\ngoals件数: ${goalsCount}\nselectedGoalId: ${state.selectedGoalId||'—'}\n\n続行しますか？`))return;const payload=structuredClone(state);payload.todayNote=els.todayNote.value;payload._updatedAt=new Date().toISOString();payload._updatedBy='stable-recovery-v2-ui';payload._appVersion='stable-recovery-v2';setStatus('クラウドへ同期中...','info');await req('POST',`/rest/v1/${TABLE}?on_conflict=app_key`,{app_key:APP_KEY,payload,updated_at:payload._updatedAt,updated_by:payload._updatedBy,app_version:payload._appVersion});localStorage.setItem(APP_KEY,JSON.stringify(payload));state=payload;render();els.cloudSummary.innerHTML=`<div>クラウドgoals件数</div><div>${goalsCount}</div><div>クラウド最終更新</div><div>${fmtTs(payload._updatedAt)}</div><div>クラウド更新者</div><div class="mono">${esc(payload._updatedBy)}</div><div>クラウドapp_version</div><div class="mono">${esc(payload._appVersion)}</div>`;setStatus('クラウド同期が完了しました','ok')}
-async function loadFromCloud(){if(!confirm('クラウドの内容でローカルを上書きします。続行しますか？'))return;setStatus('クラウド読込中...','info');const c=await fetchCloud();if(!c){setStatus('クラウドにデータが見つかりませんでした','warn');return}const cloudGoals=Array.isArray(c.payload?.goals)?c.payload.goals.length:0;const localGoals=Array.isArray(state.goals)?state.goals.length:0;if(!confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${fmtTs(c.updatedAt)}\n\n続行しますか？`))return;localStorage.setItem(APP_KEY,JSON.stringify(c.payload||DEFAULT_DATA));state=loadLocal();render();setStatus('クラウドからローカルへ反映しました','ok')}
-function download(name,text){const b=new Blob([text],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(a.href)}
-function bind(){ $('btnReload').addEventListener('click',()=>{state=loadLocal();render();setStatus('ローカル再読込','ok')});$('btnSaveLocal').addEventListener('click',()=>saveLocal());$('btnExport').addEventListener('click',()=>download(`SAFE-${APP_KEY}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`,localStorage.getItem(APP_KEY)||JSON.stringify(state,null,2)));$('btnApplyJson').addEventListener('click',()=>{if(!confirm('JSONを反映しますか？'))return;try{const d=JSON.parse(els.jsonEditor.value);if(!Array.isArray(d.goals))d.goals=[];localStorage.setItem(APP_KEY,JSON.stringify(d));state=loadLocal();render();setStatus('JSON反映完了','ok')}catch(e){setStatus('JSON反映失敗: '+e.message,'error')}});$('btnResetJson').addEventListener('click',()=>{state=loadLocal();render();setStatus('JSON再読込','ok')});$('btnSaveConfig').addEventListener('click',()=>{try{saveConfig()}catch(e){setStatus(e.message,'error')}});$('btnTest').addEventListener('click',async()=>{try{await testConnection()}catch(e){setStatus('接続テスト失敗: '+e.message,'error')}});$('btnSync').addEventListener('click',async()=>{try{await sync()}catch(e){setStatus('クラウド同期失敗: '+e.message,'error')}});$('btnLoadCloud').addEventListener('click',async()=>{try{await loadFromCloud()}catch(e){setStatus('クラウド読込失敗: '+e.message,'error')}});els.fileImport.addEventListener('change',async ev=>{const f=ev.target.files?.[0];if(!f)return;try{const t=await f.text();const d=JSON.parse(t);if(!Array.isArray(d.goals))d.goals=[];localStorage.setItem(APP_KEY,JSON.stringify(d));state=loadLocal();render();setStatus('JSONインポート完了','ok')}catch(e){setStatus('JSONインポート失敗: '+e.message,'error')}finally{ev.target.value=''}})}
-function init(){const cfg=loadConfig();els.projectUrl.value=cfg.projectUrl||'';els.anonKey.value=cfg.anonKey||'';render();bind();setStatus('初期化完了。','ok')}
-init();
-})();
-</script>
-</body>
-</html>
