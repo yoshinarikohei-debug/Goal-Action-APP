@@ -69,6 +69,7 @@
           <button class="btn btn-outline" id="btnExportTop">JSONエクスポート</button>
           <label for="fileImportTop" class="btn btn-outline" style="display:inline-flex;align-items:center;">JSONインポート</label>
           <input id="fileImportTop" type="file" accept="application/json,.json" style="display:none;" />
+          <div id="syncStatusBadge" class="sync-status-badge" data-status="idle">待機中</div>
         </div>
       </div>
       <div id="statusBox" class="status">初期化中...</div>
@@ -77,7 +78,7 @@
     <section class="panel-grid">
       <div class="card">
         <div class="section-title">絞り込みと保存</div>
-        <div class="section-sub">分類タブで表示を絞り込み、編集後はローカル保存または同期を行ってください。</div>
+        <div class="section-sub">分類タブで表示を絞り込み、編集内容は自動保存・自動同期されます。必要時のみ手動保存 / 手動同期を使ってください。</div>
         <div id="categoryTabs" class="category-tabs"></div>
         <div class="goal-edit-grid">
           <div>
@@ -95,7 +96,7 @@
       </div>
       <div class="card sync-panel">
         <div class="section-title">Supabase 同期</div>
-        <div class="section-sub">空データを防ぎながら、ローカルとクラウドを同期します。</div>
+        <div class="section-sub">空データ事故を防ぎながら、ローカル保存後の変更を自動同期します。必要時のみ手動同期してください。</div>
         <div class="kv" style="margin-bottom:12px;">
           <div>Project URL</div><div><input class="input" id="projectUrlInput" type="text" placeholder="https://xxxx.supabase.co" /></div>
           <div>Anon Key</div><div><textarea id="anonKeyInput" placeholder="eyJhbGciOi..."></textarea></div>
@@ -103,7 +104,7 @@
         <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;">
           <button class="btn btn-green" id="btnSaveConfig">設定を保存</button>
           <button class="btn btn-outline" id="btnTestConnection">接続テスト</button>
-          <button class="btn btn-blue" id="btnSyncToCloud">今の内容を同期</button>
+          <button class="btn btn-blue" id="btnSyncToCloud">今すぐ同期</button>
           <button class="btn btn-outline" id="btnLoadFromCloud">クラウドを読み込む</button>
         </div>
         <div class="kv" id="cloudSummary" style="margin-top:12px;"></div>
@@ -210,6 +211,13 @@
   const CONFIG_KEY = 'goal-action-sync-config';
   const TABLE_NAME = 'app_sync_state';
   const ACTION_MAX = 15;
+  const APP_VERSION = 'production-rebuild-v1-autosave-sync';
+  const AUTO_SYNC_DELAY = 4000;
+  const NOTE_SAVE_DELAY = 800;
+  let autoSyncTimer = null;
+  let todayNoteTimer = null;
+  let hasUnsyncedChanges = false;
+  let isSyncing = false;
   const uid = () => Math.random().toString(36).slice(2, 10);
   const pad = (n) => String(n).padStart(2, '0');
   const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
@@ -288,12 +296,87 @@
     }
   }
 
-  function saveData(updatedBy='production-rebuild-local-save'){
+  function setSyncBadge(message, status='idle'){
+    const badge = el('syncStatusBadge');
+    if(!badge) return;
+    badge.textContent = message;
+    badge.dataset.status = status;
+  }
+
+  function scheduleAutoSync(){
+    hasUnsyncedChanges = true;
+    setSyncBadge('保存済み / 自動同期待ち', 'saving');
+    if(autoSyncTimer) clearTimeout(autoSyncTimer);
+    autoSyncTimer = setTimeout(async () => {
+      await syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-v1-auto-sync'});
+    }, AUTO_SYNC_DELAY);
+  }
+
+  function saveData(updatedBy='production-rebuild-local-save', options={}){
+    const { scheduleSync = true, refresh = true } = options;
     state._updatedAt = new Date().toISOString();
     state._updatedBy = updatedBy;
-    state._appVersion = 'production-rebuild-v1';
+    state._appVersion = APP_VERSION;
     localStorage.setItem(APP_KEY, JSON.stringify(state));
-    refreshLocalMiniStatus();
+    if(refresh) refreshLocalMiniStatus();
+    if(scheduleSync) scheduleAutoSync();
+    else setSyncBadge('ローカル保存済み', 'idle');
+  }
+
+  function persistTodayNote({scheduleSync=true} = {}){
+    const noteEl = el('todayNoteInput');
+    if(!noteEl) return;
+    const next = noteEl.value;
+    if((state.todayNote || '') === next) return;
+    state.todayNote = next;
+    saveData('production-rebuild-today-note-auto-save', { scheduleSync, refresh:true });
+  }
+
+  function getIsoTime(value){
+    const t = new Date(value || '').getTime();
+    return Number.isNaN(t) ? 0 : t;
+  }
+
+  async function bootstrapLatestState(){
+    render();
+    updateCloudSummary(null);
+    setSyncBadge('起動確認中...', 'syncing');
+
+    const hasConfig = !!((el('projectUrlInput')?.value || '').trim() && (el('anonKeyInput')?.value || '').trim());
+    if(!hasConfig){
+      setSyncBadge('ローカル運用中', 'offline');
+      setStatus('Supabase設定未入力のため、ローカル状態で起動しました。', 'warn');
+      return;
+    }
+
+    try {
+      const cloud = await fetchCloudState();
+      updateCloudSummary(cloud);
+      if(!cloud?.payload){
+        setSyncBadge('クラウド未取得', 'idle');
+        setStatus('クラウドに保存済みデータが見つからないため、ローカル状態で起動しました。', 'ok');
+        return;
+      }
+
+      const localTime = getIsoTime(state?._updatedAt);
+      const cloudTime = getIsoTime(cloud.updatedAt || cloud.payload?._updatedAt);
+
+      if(cloudTime > localTime){
+        state = cloud.payload;
+        if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id;
+        localStorage.setItem(APP_KEY, JSON.stringify(state));
+        render();
+        setSyncBadge('クラウド最新を反映', 'synced');
+        setStatus('クラウドの方が新しかったため、自動で最新状態を反映しました。', 'ok');
+      } else {
+        setSyncBadge('ローカル最新で起動', 'synced');
+        setStatus('ローカル最新状態で起動しました。', 'ok');
+      }
+    } catch(err){
+      console.error(err);
+      setSyncBadge('クラウド確認失敗', 'error');
+      setStatus('起動時のクラウド確認をスキップしました: ' + err.message, 'warn');
+    }
   }
 
   function selectedGoal(){
@@ -660,7 +743,7 @@
     if(!data || !Array.isArray(data.goals)) throw new Error('goals を含むJSONではありません');
     state = data;
     if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id;
-    saveData('production-rebuild-import-json');
+    saveData('production-rebuild-import-json', { scheduleSync:false });
     render();
     setStatus('JSONインポートが完了しました。', 'ok');
   }
@@ -725,54 +808,90 @@
     const count = Array.isArray(info.payload?.goals) ? info.payload.goals.length : (info.goalsCount ?? '未取得');
     el('cloudSummary').innerHTML = `<div>クラウドgoals件数</div><div>${count}</div><div>クラウド最終更新</div><div>${info.updatedAt || '未取得'}</div><div>クラウド更新者</div><div>${esc(info.updatedBy || '未取得')}</div><div>クラウドapp_version</div><div>${esc(info.appVersion || '未取得')}</div>`;
   }
-  async function syncToCloud(){
-    const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
-    if(goalsCount === 0){
-      const ok = confirm('警告: goals が 0 件です。空データをクラウドへ同期する可能性があります。\n本当に続行しますか？');
-      if(!ok) return;
-    }
-    const ok2 = confirm(`ローカルの内容をクラウドへ同期します。\n\n・goals件数: ${goalsCount}\n・selectedGoalId: ${state.selectedGoalId || '—'}\n\n続行しますか？`);
-    if(!ok2) return;
+  async function syncToCloudInternal({interactive=true, skipConfirm=false, updatedBy='production-rebuild-v1-ui'} = {}){
+    if(isSyncing) return false;
 
-    state.todayNote = el('todayNoteInput').value;
+    const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
+    if(interactive && !skipConfirm && goalsCount === 0){
+      const ok = confirm('警告: goals が 0 件です。空データをクラウドへ同期する可能性があります。\n本当に続行しますか？');
+      if(!ok) return false;
+    }
+    if(interactive && !skipConfirm){
+      const ok2 = confirm(`ローカルの内容をクラウドへ同期します。\n\n・goals件数: ${goalsCount}\n・selectedGoalId: ${state.selectedGoalId || '—'}\n\n続行しますか？`);
+      if(!ok2) return false;
+    }
+
+    persistTodayNote({scheduleSync:false});
     state._updatedAt = new Date().toISOString();
-    state._updatedBy = 'production-rebuild-v1-ui';
-    state._appVersion = 'production-rebuild-v1';
+    state._updatedBy = updatedBy;
+    state._appVersion = APP_VERSION;
     localStorage.setItem(APP_KEY, JSON.stringify(state));
 
-    setStatus('クラウドへ同期中...', 'info');
-    const payload = structuredClone(state);
-    await supabaseRequest('POST', `/rest/v1/${TABLE_NAME}?on_conflict=app_key`, {
-      app_key: APP_KEY,
-      payload,
-      updated_at: payload._updatedAt,
-      updated_by: payload._updatedBy,
-      app_version: payload._appVersion
-    });
-    updateCloudSummary({payload, updatedAt: payload._updatedAt, updatedBy: payload._updatedBy, appVersion: payload._appVersion});
-    refreshLocalMiniStatus();
-    setStatus('クラウド同期が完了しました。', 'ok');
+    try {
+      isSyncing = true;
+      setSyncBadge('同期中...', 'syncing');
+      if(interactive) setStatus('クラウドへ同期中...', 'info');
+
+      const payload = structuredClone(state);
+      await supabaseRequest('POST', `/rest/v1/${TABLE_NAME}?on_conflict=app_key`, {
+        app_key: APP_KEY,
+        payload,
+        updated_at: payload._updatedAt,
+        updated_by: payload._updatedBy,
+        app_version: payload._appVersion
+      });
+      updateCloudSummary({payload, updatedAt: payload._updatedAt, updatedBy: payload._updatedBy, appVersion: payload._appVersion});
+      refreshLocalMiniStatus();
+      hasUnsyncedChanges = false;
+      setSyncBadge('同期済み ' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'}), 'synced');
+      if(interactive) setStatus('クラウド同期が完了しました。', 'ok');
+      return true;
+    } catch(err) {
+      hasUnsyncedChanges = true;
+      setSyncBadge('同期失敗', 'error');
+      if(interactive) throw err;
+      console.error('auto sync failed', err);
+      return false;
+    } finally {
+      isSyncing = false;
+    }
   }
-  async function loadFromCloud(){
-    const ok = confirm('クラウドの内容でローカルを上書きします。続行しますか？');
-    if(!ok) return;
-    setStatus('クラウド読込中...', 'info');
+
+  async function syncToCloud(){
+    return await syncToCloudInternal({interactive:true, skipConfirm:false, updatedBy:'production-rebuild-v1-ui-manual'});
+  }
+
+  async function loadFromCloud({interactive=true} = {}){
+    if(interactive){
+      const ok = confirm('クラウドの内容でローカルを上書きします。続行しますか？');
+      if(!ok) return false;
+      setStatus('クラウド読込中...', 'info');
+    }
+
     const cloud = await fetchCloudState();
     if(!cloud){
       updateCloudSummary(null);
-      setStatus('クラウドにデータが見つかりませんでした。', 'warn');
-      return;
+      if(interactive) setStatus('クラウドにデータが見つかりませんでした。', 'warn');
+      setSyncBadge('クラウドデータなし', 'idle');
+      return false;
     }
+
     const cloudGoals = Array.isArray(cloud.payload?.goals) ? cloud.payload.goals.length : 0;
     const localGoals = Array.isArray(state.goals) ? state.goals.length : 0;
-    const ok2 = confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${cloud.updatedAt || '未取得'}\n\n続行しますか？`);
-    if(!ok2) return;
+    if(interactive){
+      const ok2 = confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${cloud.updatedAt || '未取得'}\n\n続行しますか？`);
+      if(!ok2) return false;
+    }
+
     state = cloud.payload || structuredClone(initialData);
     if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id;
     localStorage.setItem(APP_KEY, JSON.stringify(state));
     render();
     updateCloudSummary(cloud);
-    setStatus('クラウドからローカルへ反映しました。', 'ok');
+    hasUnsyncedChanges = false;
+    setSyncBadge('クラウド読込完了', 'synced');
+    if(interactive) setStatus('クラウドからローカルへ反映しました。', 'ok');
+    return true;
   }
 
   function bindEvents(){
@@ -793,11 +912,40 @@
       if(cmd === 'delete') deleteAction(id);
     });
 
-    el('btnSaveLocal').addEventListener('click', () => {
-      state.todayNote = el('todayNoteInput').value;
-      saveData('production-rebuild-local-save');
+    el('btnSaveLocal').addEventListener('click', async () => {
+      persistTodayNote({scheduleSync:false});
+      saveData('production-rebuild-local-save-manual', { scheduleSync:false });
       render();
+      setSyncBadge('ローカル保存済み', 'idle');
       setStatus('ローカル保存が完了しました。', 'ok');
+    });
+
+    el('todayNoteInput').addEventListener('input', () => {
+      if(todayNoteTimer) clearTimeout(todayNoteTimer);
+      todayNoteTimer = setTimeout(() => {
+        persistTodayNote({scheduleSync:true});
+      }, NOTE_SAVE_DELAY);
+    });
+
+    window.addEventListener('beforeunload', () => {
+      try {
+        persistTodayNote({scheduleSync:false});
+        if(hasUnsyncedChanges && !isSyncing){
+          state._updatedAt = new Date().toISOString();
+          state._updatedBy = 'production-rebuild-beforeunload';
+          state._appVersion = APP_VERSION;
+          localStorage.setItem(APP_KEY, JSON.stringify(state));
+        }
+      } catch(_) {}
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if(document.visibilityState === 'hidden'){
+        persistTodayNote({scheduleSync:false});
+        if(hasUnsyncedChanges && !isSyncing){
+          syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-visibility-sync'});
+        }
+      }
     });
     el('btnExportTop').addEventListener('click', exportJson);
     el('fileImportTop').addEventListener('change', async (e) => {
@@ -834,17 +982,14 @@
     refreshLocalMiniStatus();
   }
 
-  function init(){
+  async function init(){
     const cfg = loadConfig();
     el('projectUrlInput').value = cfg.projectUrl || '';
     el('anonKeyInput').value = cfg.anonKey || '';
     bindEvents();
     initSafeToggle();
-    render();
-    updateCloudSummary(null);
-    setStatus('初期化完了。元デザインベースの本番再構築版です。', 'ok');
+    await bootstrapLatestState();
   }
-
   init();
 })();
 </script>
