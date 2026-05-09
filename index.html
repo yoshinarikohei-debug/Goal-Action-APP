@@ -239,11 +239,11 @@
   const TABLE_NAME = 'app_sync_state';
   const ACTION_MAX = 15;
   const APP_VERSION = 'production-rebuild-v1-repeat-v1';
-  const TASK_CATEGORIES = ['肉体','社会・情緒','知識','精神'];
+  const TASK_CATEGORIES = ['肉体','社会・情緒','知性','精神'];
   const CATEGORY_META = {
     '肉体': { color: '#22c55e' },
     '社会・情緒': { color: '#f59e0b' },
-    '知識': { color: '#2563eb' },
+    '知性': { color: '#2563eb' },
     '精神': { color: '#8b5cf6' }
   };
   const AUTO_SYNC_DELAY = 4000;
@@ -259,10 +259,10 @@
   const now = new Date(), CURRENT_YEAR = now.getFullYear(), CURRENT_MONTH = now.getMonth(), TODAY_STR = getTodayStr();
 
   const seedActions = [
-    {id:uid(),title:'AIトレ',detail:'AI活用の学習または実践を15分以上進める',priority:'高',category:'知識',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
-    {id:uid(),title:'資料更新',detail:'資料を1スライドでも前進させる',priority:'高',category:'知識',repeatType:'weekday',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
+    {id:uid(),title:'AIトレ',detail:'AI活用の学習または実践を15分以上進める',priority:'高',category:'知性',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
+    {id:uid(),title:'資料更新',detail:'資料を1スライドでも前進させる',priority:'高',category:'知性',repeatType:'weekday',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
     {id:uid(),title:'振り返り',detail:'今日の活動を3行で整理し、次の一歩を明確にする',priority:'中',category:'精神',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
-    {id:uid(),title:'読書',detail:'ビジネス書または専門資料を10分読む',priority:'中',category:'知識',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
+    {id:uid(),title:'読書',detail:'ビジネス書または専門資料を10分読む',priority:'中',category:'知性',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
     {id:uid(),title:'運動',detail:'散歩や軽運動を10分以上行う',priority:'低',category:'肉体',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false}
   ];
 
@@ -309,7 +309,7 @@
   }
 
   function normalizeAction(action={}){
-    const normalizedCategory = TASK_CATEGORIES.includes(action.category) ? action.category : '知識';
+    const normalizedCategory = TASK_CATEGORIES.includes(action.category) ? action.category : '知性';
     const normalizedRepeatType = ['once','daily','weekday','weekly','monthly'].includes(action.repeatType) ? action.repeatType : 'daily';
     const normalizedStartDate = action.startDate || TODAY_STR;
     const normalizedEndDate = action.endDate || '';
@@ -753,7 +753,7 @@
     editingActionId = null;
     el('actionTitleInput').value = '';
     el('actionDetailInput').value = '';
-    el('actionCategoryInput').value = '知識';
+    el('actionCategoryInput').value = '知性';
     el('actionPriorityInput').value = '中';
     el('actionRepeatTypeInput').value = 'daily';
     setSelectedRepeatDays([]);
@@ -770,7 +770,7 @@
     editingActionId = id;
     el('actionTitleInput').value = action.title || '';
     el('actionDetailInput').value = action.detail || '';
-    el('actionCategoryInput').value = action.category || '知識';
+    el('actionCategoryInput').value = action.category || '知性';
     el('actionPriorityInput').value = action.priority || '中';
     el('actionRepeatTypeInput').value = action.repeatType || 'daily';
     setSelectedRepeatDays(action.repeatDays || []);
