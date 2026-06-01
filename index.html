@@ -57,7 +57,7 @@
     .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
     .timeline-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-bottom:18px}.archive-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.archive-btn{border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px;text-align:left;cursor:pointer;transition:.2s ease}.archive-btn:hover{transform:translateY(-1px)}.archive-btn.active{border-color:#2563eb;box-shadow:0 8px 18px rgba(37,99,235,.12)}.archive-btn.closed{background:#f8fafc}.archive-btn.future{opacity:.45;cursor:not-allowed}.archive-btn .m{font-size:12px;color:var(--muted);margin-bottom:6px}.archive-btn .v{font-size:18px;font-weight:800}.archive-btn .s{font-size:12px;color:#475569;margin-top:4px}
     .year-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.month-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.month-title{font-size:22px;font-weight:800}.year-select{min-width:130px}
-    .year-summary-list{display:grid;gap:10px}.year-summary-row{display:grid;grid-template-columns:58px minmax(0,1fr) 70px;gap:10px;align-items:center}.year-summary-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}.year-summary-fill{height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);border-radius:inherit}.hint-list{display:grid;gap:8px}.hint-item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px}.hint-item strong{display:block;font-size:14px;margin-bottom:4px}.sync-status-badge{display:inline-flex;align-items:center;padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:800}
+    .year-summary-list{display:grid;gap:10px}.year-summary-row{display:grid;grid-template-columns:58px minmax(0,1fr) 70px;gap:10px;align-items:center}.year-summary-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}.year-summary-fill{height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);border-radius:inherit}.sync-status-badge{display:inline-flex;align-items:center;padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:800}
     @media (max-width:1140px){.stats{grid-template-columns:repeat(2,1fr)}.analysis-grid,.execution-grid,.layout-bottom,.timeline-grid{grid-template-columns:1fr}.action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.task-form-grid{grid-template-columns:1fr 1fr}.archive-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media (max-width:820px){.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-grid{grid-template-columns:1fr}.span-2{grid-column:span 1}.archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:720px){.container{padding:14px}.hero{padding:18px}.hero h1{font-size:24px}.stats,.action-grid,.mini-grid,.goal-meta-grid{grid-template-columns:1fr}.task-form-grid{grid-template-columns:1fr}.task-item{flex-direction:column;align-items:stretch}.bars{min-width:620px}.archive-grid{grid-template-columns:1fr}.year-summary-row{grid-template-columns:44px minmax(0,1fr) 60px}}
@@ -180,7 +180,7 @@
     <section class="dashboard-grid">
       <div class="center-stack">
         <div class="focus-card" id="goalSummaryArea"></div>
-                <details class="safe-toggle" id="actionSettingToggle">
+        <details class="safe-toggle" id="actionSettingToggle">
           <summary>
             <div class="safe-toggle-meta">
               <div class="section-title">タスク設定</div>
@@ -264,7 +264,7 @@
   const CONFIG_KEY = 'goal-action-sync-config';
   const TABLE_NAME = 'app_sync_state';
   const ACTION_MAX = 15;
-  const APP_VERSION = 'production-rebuild-v2-annual-archive';
+  const APP_VERSION = 'production-rebuild-v2-annual-archive-no-hints';
   const TASK_CATEGORIES = ['肉体','社会・情緒','知性','精神'];
   const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const CATEGORY_META = {
@@ -320,16 +320,13 @@
   let editingGoalId = null;
   let editingActionId = null;
   const el = (id) => document.getElementById(id);
-
   function structuredCloneSafe(obj){ return JSON.parse(JSON.stringify(obj)); }
-
   function parseDateOnly(dateStr){
     if(!dateStr) return null;
     const parts = String(dateStr).split('-').map(Number);
     if(parts.length !== 3 || parts.some(v => Number.isNaN(v))) return null;
     return new Date(parts[0], parts[1]-1, parts[2]);
   }
-
   function normalizeAction(action={}){
     const normalizedCategory = TASK_CATEGORIES.includes(action.category) ? action.category : '知性';
     const normalizedRepeatType = ['once','daily','weekday','weekly','monthly'].includes(action.repeatType) ? action.repeatType : 'daily';
@@ -337,27 +334,13 @@
     const normalizedEndDate = action.endDate || '';
     const normalizedRepeatDays = Array.isArray(action.repeatDays) ? action.repeatDays.map(v => Number(v)).filter(v => Number.isInteger(v) && v >= 0 && v <= 6) : [];
     return {
-      id: action.id || uid(),
-      title: action.title || '',
-      detail: action.detail || '',
+      id: action.id || uid(), title: action.title || '', detail: action.detail || '',
       priority: ['高','中','低'].includes(action.priority) ? action.priority : '中',
-      category: normalizedCategory,
-      repeatType: normalizedRepeatType,
-      repeatDays: normalizedRepeatDays,
-      startDate: normalizedStartDate,
-      endDate: normalizedEndDate,
-      paused: !!action.paused
+      category: normalizedCategory, repeatType: normalizedRepeatType, repeatDays: normalizedRepeatDays,
+      startDate: normalizedStartDate, endDate: normalizedEndDate, paused: !!action.paused
     };
   }
-
-  function normalizeGoal(goal={}){
-    return {
-      ...goal,
-      actions: Array.isArray(goal.actions) ? goal.actions.map(normalizeAction) : [],
-      actionLogs: goal.actionLogs && typeof goal.actionLogs === 'object' ? goal.actionLogs : {}
-    };
-  }
-
+  function normalizeGoal(goal={}){ return { ...goal, actions: Array.isArray(goal.actions) ? goal.actions.map(normalizeAction) : [], actionLogs: goal.actionLogs && typeof goal.actionLogs === 'object' ? goal.actionLogs : {} }; }
   function normalizeState(data){
     const base = data && typeof data === 'object' ? data : structuredCloneSafe(initialData);
     const goals = Array.isArray(base.goals) ? base.goals.map(normalizeGoal) : structuredCloneSafe(initialData.goals).map(normalizeGoal);
@@ -367,60 +350,35 @@
     const viewMonth = Number.isInteger(vm) && vm >= 0 && vm <= 11 ? vm : CURRENT_MONTH;
     return { ...base, goals, selectedGoalId, viewYear, viewMonth };
   }
-
   function loadData(){
     try{
       const raw = localStorage.getItem(APP_KEY);
       if(!raw) return normalizeState(structuredCloneSafe(initialData));
-      const parsed = JSON.parse(raw);
-      return normalizeState(parsed);
-    } catch(e){
-      return normalizeState(structuredCloneSafe(initialData));
-    }
+      return normalizeState(JSON.parse(raw));
+    } catch(e){ return normalizeState(structuredCloneSafe(initialData)); }
   }
-
   let state = loadData();
   if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id;
 
   function setStatus(message, kind='info'){
     const box = el('statusBox');
-    const map = {
-      info:['rgba(255,255,255,.12)','rgba(255,255,255,.22)','#fff'],
-      ok:['rgba(16,185,129,.18)','rgba(167,243,208,.45)','#eafff6'],
-      warn:['rgba(245,158,11,.18)','rgba(253,230,138,.45)','#fff9eb'],
-      error:['rgba(220,38,38,.18)','rgba(254,202,202,.45)','#fff5f5']
-    };
+    const map = { info:['rgba(255,255,255,.12)','rgba(255,255,255,.22)','#fff'], ok:['rgba(16,185,129,.18)','rgba(167,243,208,.45)','#eafff6'], warn:['rgba(245,158,11,.18)','rgba(253,230,138,.45)','#fff9eb'], error:['rgba(220,38,38,.18)','rgba(254,202,202,.45)','#fff5f5'] };
     const [bg, bd, tx] = map[kind] || map.info;
     box.style.background = bg; box.style.border = '1px solid ' + bd; box.style.color = tx; box.textContent = message;
   }
-
-  function setSyncBadge(message, status='idle'){
-    const badge = el('syncStatusBadge');
-    if(!badge) return;
-    badge.textContent = message;
-    badge.dataset.status = status;
-  }
-
+  function setSyncBadge(message, status='idle'){ const badge = el('syncStatusBadge'); if(!badge) return; badge.textContent = message; badge.dataset.status = status; }
   function saveData(updatedBy='production-rebuild-local-save', options={}){
     const { scheduleSync = true, refresh = true } = options;
-    state._updatedAt = new Date().toISOString();
-    state._updatedBy = updatedBy;
-    state._appVersion = APP_VERSION;
+    state._updatedAt = new Date().toISOString(); state._updatedBy = updatedBy; state._appVersion = APP_VERSION;
     localStorage.setItem(APP_KEY, JSON.stringify(state));
     if(refresh) refreshLocalMiniStatus();
-    if(scheduleSync) scheduleAutoSync();
-    else setSyncBadge('ローカル保存済み', 'idle');
+    if(scheduleSync) scheduleAutoSync(); else setSyncBadge('ローカル保存済み', 'idle');
   }
-
   function scheduleAutoSync(){
-    hasUnsyncedChanges = true;
-    setSyncBadge('保存済み / 自動同期待ち', 'saving');
+    hasUnsyncedChanges = true; setSyncBadge('保存済み / 自動同期待ち', 'saving');
     if(autoSyncTimer) clearTimeout(autoSyncTimer);
-    autoSyncTimer = setTimeout(async () => {
-      await syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-v2-auto-sync'});
-    }, AUTO_SYNC_DELAY);
+    autoSyncTimer = setTimeout(async () => { await syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-v2-auto-sync'}); }, AUTO_SYNC_DELAY);
   }
-
   function getIsoTime(value){ const t = new Date(value || '').getTime(); return Number.isNaN(t) ? 0 : t; }
   function selectedGoal(){ return state.goals.find(g => g.id === state.selectedGoalId) || state.goals[0] || null; }
   function currentActions(goal = selectedGoal()){ return goal?.actions || []; }
@@ -428,8 +386,7 @@
   function getDoneActions(ds, goal = selectedGoal()){ return currentLogs(goal)[ds] || []; }
   function isActionDone(ds, id, goal = selectedGoal()){ return getDoneActions(ds, goal).includes(id); }
   function getCategoryColor(category){ return CATEGORY_META[category]?.color || '#2563eb'; }
-  function daysLeft(dateStr){ if(!dateStr) return null; const today = new Date(); const target = new Date(dateStr); const base = new Date(today.getFullYear(), today.getMonth(), today.getDate()); return Math.ceil((target - base) / (1000*60*60*24)); }
-
+  function daysLeft(dateStr){ if(!dateStr) return null; const today = new Date(), target = new Date(dateStr), base = new Date(today.getFullYear(), today.getMonth(), today.getDate()); return Math.ceil((target - base) / (1000*60*60*24)); }
   function isActionScheduledForDate(action, ds){
     if(!action || action.paused) return false;
     const target = parseDateOnly(ds); if(!target) return false;
@@ -451,20 +408,13 @@
       default: return true;
     }
   }
-
   function getScheduledActionsForDate(ds, goal = selectedGoal()){ return currentActions(goal).filter(action => isActionScheduledForDate(action, ds)); }
-  function getDoneCountForDate(ds, goal = selectedGoal()){
-    const scheduledIds = new Set(getScheduledActionsForDate(ds, goal).map(action => action.id));
-    return getDoneActions(ds, goal).filter(id => scheduledIds.has(id)).length;
-  }
+  function getDoneCountForDate(ds, goal = selectedGoal()){ const scheduledIds = new Set(getScheduledActionsForDate(ds, goal).map(action => action.id)); return getDoneActions(ds, goal).filter(id => scheduledIds.has(id)).length; }
   function calcActionRate(ds, goal = selectedGoal()){ const actions = getScheduledActionsForDate(ds, goal); if(!actions.length) return 0; return Math.round((getDoneCountForDate(ds, goal) / actions.length) * 100); }
   function countActionThisMonth(id, goal = selectedGoal(), year = state.viewYear, month = state.viewMonth){
     const action = currentActions(goal).find(v => v.id === id); if(!action) return 0;
-    return Array.from({length:getDaysInMonth(year, month)}, (_,i)=>i+1)
-      .map(day => getDateStr(year, month, day))
-      .filter(ds => isActionScheduledForDate(action, ds) && isActionDone(ds, id, goal)).length;
+    return Array.from({length:getDaysInMonth(year, month)}, (_,i)=>i+1).map(day => getDateStr(year, month, day)).filter(ds => isActionScheduledForDate(action, ds) && isActionDone(ds, id, goal)).length;
   }
-
   function calcActionStreak(id, goal = selectedGoal()){
     const action = currentActions(goal).find(v => v.id === id); if(!action) return 0;
     let streak = 0; const cursor = new Date();
@@ -475,7 +425,6 @@
     }
     return streak;
   }
-
   function getRepeatLabel(action){
     switch(action.repeatType){
       case 'once': return '単発';
@@ -487,73 +436,40 @@
     }
   }
   function getScheduleSummary(action){ const range = [action.startDate || '開始日未設定', action.endDate || '終了日なし'].join(' 〜 '); const paused = action.paused ? ' / 一時停止中' : ''; return `${getRepeatLabel(action)} / ${range}${paused}`; }
-
   function getMonthTitle(year = state.viewYear, month = state.viewMonth){ return `${year}年${month+1}月`; }
   function isMonthInFuture(year, month){ return year > CURRENT_YEAR || (year === CURRENT_YEAR && month > CURRENT_MONTH); }
   function isMonthClosed(year, month){ return year < CURRENT_YEAR || (year === CURRENT_YEAR && month < CURRENT_MONTH); }
-
   function getMonthStats(goal = selectedGoal(), year = state.viewYear, month = state.viewMonth){
-    const days = getDaysInMonth(year, month);
-    let scheduledTotal = 0, doneTotal = 0, activeDays = 0, loggedDays = 0;
+    const days = getDaysInMonth(year, month); let scheduledTotal = 0, doneTotal = 0, activeDays = 0, loggedDays = 0;
     for(let day=1; day<=days; day++){
-      const ds = getDateStr(year, month, day);
-      const scheduled = getScheduledActionsForDate(ds, goal);
-      const done = getDoneCountForDate(ds, goal);
-      scheduledTotal += scheduled.length;
-      doneTotal += done;
-      if(scheduled.length > 0) activeDays++;
-      if(done > 0) loggedDays++;
+      const ds = getDateStr(year, month, day); const scheduled = getScheduledActionsForDate(ds, goal); const done = getDoneCountForDate(ds, goal);
+      scheduledTotal += scheduled.length; doneTotal += done; if(scheduled.length > 0) activeDays++; if(done > 0) loggedDays++;
     }
     const rate = scheduledTotal ? Math.round((doneTotal / scheduledTotal) * 100) : 0;
     return { year, month, days, scheduledTotal, doneTotal, activeDays, loggedDays, rate };
   }
-
   function getYearStats(goal = selectedGoal(), year = state.viewYear){
     let totalScheduled = 0, totalDone = 0, activeMonths = 0, bestMonth = null;
     const months = Array.from({length:12}, (_,month) => {
-      const stats = getMonthStats(goal, year, month);
-      totalScheduled += stats.scheduledTotal; totalDone += stats.doneTotal;
-      if(stats.scheduledTotal > 0 || stats.doneTotal > 0) activeMonths++;
-      if(!bestMonth || stats.rate > bestMonth.rate) bestMonth = stats;
-      return stats;
+      const stats = getMonthStats(goal, year, month); totalScheduled += stats.scheduledTotal; totalDone += stats.doneTotal;
+      if(stats.scheduledTotal > 0 || stats.doneTotal > 0) activeMonths++; if(!bestMonth || stats.rate > bestMonth.rate) bestMonth = stats; return stats;
     });
     return { year, totalScheduled, totalDone, activeMonths, rate: totalScheduled ? Math.round((totalDone/totalScheduled)*100) : 0, bestMonth, months };
   }
-
   function getAvailableYears(){
     const years = new Set([CURRENT_YEAR]);
     (state.goals || []).forEach(goal => {
-      Object.keys(goal.actionLogs || {}).forEach(ds => {
-        const d = parseDateOnly(ds); if(d) years.add(d.getFullYear());
-      });
-      (goal.actions || []).forEach(action => {
-        const s = parseDateOnly(action.startDate); const e = parseDateOnly(action.endDate);
-        if(s) years.add(s.getFullYear()); if(e) years.add(e.getFullYear());
-      });
+      Object.keys(goal.actionLogs || {}).forEach(ds => { const d = parseDateOnly(ds); if(d) years.add(d.getFullYear()); });
+      (goal.actions || []).forEach(action => { const s = parseDateOnly(action.startDate), e = parseDateOnly(action.endDate); if(s) years.add(s.getFullYear()); if(e) years.add(e.getFullYear()); });
     });
     return Array.from(years).sort((a,b)=>a-b);
   }
-
   function changeViewMonth(year, month){
-    const y = Number(year), m = Number(month);
-    if(!Number.isInteger(y) || !Number.isInteger(m) || m < 0 || m > 11) return;
-    if(isMonthInFuture(y, m)) return;
-    state.viewYear = y; state.viewMonth = m;
-    saveData('production-rebuild-view-month', { scheduleSync:false, refresh:true });
-    render();
-    setStatus(`${getMonthTitle(y,m)} を表示しています。`, 'ok');
+    const y = Number(year), m = Number(month); if(!Number.isInteger(y) || !Number.isInteger(m) || m < 0 || m > 11) return; if(isMonthInFuture(y, m)) return;
+    state.viewYear = y; state.viewMonth = m; saveData('production-rebuild-view-month', { scheduleSync:false, refresh:true }); render(); setStatus(`${getMonthTitle(y,m)} を表示しています。`, 'ok');
   }
-
   function renderStats(){
-    const goal = selectedGoal();
-    const actions = currentActions(goal);
-    const todayActions = getScheduledActionsForDate(TODAY_STR, goal);
-    const todayRate = calcActionRate(TODAY_STR, goal);
-    const todayDoneCount = getDoneCountForDate(TODAY_STR, goal);
-    const monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
-    const yearStats = getYearStats(goal, state.viewYear);
-    const bestStreak = actions.length ? Math.max(...actions.map(a => calcActionStreak(a.id, goal))) : 0;
-    const bestMonthLabel = yearStats.bestMonth ? `${yearStats.bestMonth.month+1}月` : '—';
+    const goal = selectedGoal(), actions = currentActions(goal), todayActions = getScheduledActionsForDate(TODAY_STR, goal), todayRate = calcActionRate(TODAY_STR, goal), todayDoneCount = getDoneCountForDate(TODAY_STR, goal), monthStats = getMonthStats(goal, state.viewYear, state.viewMonth), yearStats = getYearStats(goal, state.viewYear), bestStreak = actions.length ? Math.max(...actions.map(a => calcActionStreak(a.id, goal))) : 0, bestMonthLabel = yearStats.bestMonth ? `${yearStats.bestMonth.month+1}月` : '—';
     el('stats').innerHTML = [
       ['📈','blue','今日の達成率',`${todayRate}%`,`${todayDoneCount}/${todayActions.length} タスク`,'本日',TODAY_STR,Math.max(0, Math.min(100, todayRate)),true],
       ['🗓️','','表示月の達成率',`${monthStats.rate}%`,`${monthStats.doneTotal}/${monthStats.scheduledTotal} 実行`,'表示月',getMonthTitle(state.viewYear, state.viewMonth),monthStats.rate,true],
@@ -561,62 +477,36 @@
       ['🔥','','最長継続',`${bestStreak}日`,`ベスト月 ${bestMonthLabel}`,'継続',`登録 ${actions.length}件`,0,false]
     ].map(([emoji,color,label,value,sub,metaLeft,metaRight,progress,isEmphasis]) => `
       <div class="card stat-card ${isEmphasis ? 'emphasis' : ''}">
-        <div class="stat-card-head">
-          <div>
-            <div class="stat-icon ${color}">${emoji}</div>
-            <div class="stat-label">${label}</div>
-          </div>
-          ${isEmphasis ? `<div class="stat-trend">${metaRight}</div>` : ''}
-        </div>
-        <div class="stat-value">${value}</div>
-        <div class="stat-sub">${sub}</div>
+        <div class="stat-card-head"><div><div class="stat-icon ${color}">${emoji}</div><div class="stat-label">${label}</div></div>${isEmphasis ? `<div class="stat-trend">${metaRight}</div>` : ''}</div>
+        <div class="stat-value">${value}</div><div class="stat-sub">${sub}</div>
         ${isEmphasis ? `<div class="stat-progress"><div class="stat-progress-fill" style="width:${progress}%"></div></div><div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>` : `<div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>`}
       </div>`).join('');
     el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
     el('actionCounterInline').textContent = `登録 ${actions.length} / ${ACTION_MAX} 件`;
   }
-
   function renderViewNavigation(){
     el('viewMonthTitle').textContent = getMonthTitle(state.viewYear, state.viewMonth);
     const summaryType = isMonthClosed(state.viewYear, state.viewMonth) ? 'アーカイブ閲覧中' : '進行中の月';
     el('viewMonthSub').textContent = `${summaryType}。終了した月は固定的に振り返り、今月は日々更新されます。`;
-
     const yearSelect = el('viewYearSelect');
     const years = getAvailableYears();
     yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y===state.viewYear?'selected':''}>${y}年</option>`).join('');
-
     const goal = selectedGoal();
     const archiveGrid = el('archiveGrid');
     archiveGrid.innerHTML = Array.from({length:12}, (_,month) => {
-      const stats = getMonthStats(goal, state.viewYear, month);
-      const future = isMonthInFuture(state.viewYear, month);
-      const closed = isMonthClosed(state.viewYear, month);
-      const active = state.viewMonth === month;
-      const status = future ? '予定前' : closed ? '終了月' : '今月';
-      const className = `archive-btn ${active ? 'active' : ''} ${closed ? 'closed' : ''} ${future ? 'future' : ''}`;
+      const stats = getMonthStats(goal, state.viewYear, month), future = isMonthInFuture(state.viewYear, month), closed = isMonthClosed(state.viewYear, month), active = state.viewMonth === month, status = future ? '予定前' : closed ? '終了月' : '今月', className = `archive-btn ${active ? 'active' : ''} ${closed ? 'closed' : ''} ${future ? 'future' : ''}`;
       return `<button class="${className}" data-archive-month="${month}" ${future ? 'disabled' : ''}><div class="m">${status}</div><div class="v">${MONTH_NAMES[month]}</div><div class="s">達成率 ${stats.rate}% / 実行 ${stats.doneTotal}件</div></button>`;
     }).join('');
-
     const yearStats = getYearStats(goal, state.viewYear);
-    el('yearSummaryList').innerHTML = yearStats.months.map(stats => {
-      const width = Math.max(2, stats.rate);
-      return `<div class="year-summary-row"><div>${stats.month+1}月</div><div class="year-summary-track"><div class="year-summary-fill" style="width:${width}%"></div></div><div style="text-align:right;font-size:12px;color:#475569;">${stats.rate}%</div></div>`;
-    }).join('');
+    el('yearSummaryList').innerHTML = yearStats.months.map(stats => { const width = Math.max(2, stats.rate); return `<div class="year-summary-row"><div>${stats.month+1}月</div><div class="year-summary-track"><div class="year-summary-fill" style="width:${width}%"></div></div><div style="text-align:right;font-size:12px;color:#475569;">${stats.rate}%</div></div>`; }).join('');
   }
-
   function renderGoalSummary(){
     const goal = selectedGoal(), actions = currentActions(goal), monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
     if(!goal){ el('goalSummaryArea').innerHTML = `<div class="empty">目標を選択してください。</div>`; return; }
     el('goalSummaryArea').innerHTML = `
       <div class="goal-main-head">
-        <div>
-          <div class="goal-title">${esc(goal.title)}</div>
-          <div class="goal-category">${esc(goal.category || '未設定')}</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-outline" id="editGoalBtn">編集</button>
-          <button class="btn btn-danger" id="deleteGoalBtn">削除</button>
-        </div>
+        <div><div class="goal-title">${esc(goal.title)}</div><div class="goal-category">${esc(goal.category || '未設定')}</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-outline" id="editGoalBtn">編集</button><button class="btn btn-danger" id="deleteGoalBtn">削除</button></div>
       </div>
       <div style="background:#f8fafc;border-radius:18px;padding:14px;font-size:14px;line-height:1.7;color:#475569;margin-bottom:14px;">${esc(goal.purpose || '目的未設定')}</div>
       <div class="mini-grid">
@@ -636,18 +526,14 @@
       saveData('production-rebuild-delete-goal'); resetActionForm(); render(); setStatus('目標を削除しました。', 'warn');
     });
   }
-
   function renderGoals(){
-    const list = el('goalList'); const visibleGoals = state.goals || [];
+    const list = el('goalList'), visibleGoals = state.goals || [];
     list.innerHTML = visibleGoals.length ? visibleGoals.map(goal => {
-      const active = goal.id === state.selectedGoalId, left = daysLeft(goal.targetDate), actions = goal.actions || []; const yearStats = getYearStats(goal, state.viewYear);
+      const active = goal.id === state.selectedGoalId, left = daysLeft(goal.targetDate), actions = goal.actions || [], yearStats = getYearStats(goal, state.viewYear);
       return `<button class="goal-card ${active ? 'active' : ''}" data-goal-id="${goal.id}"><div class="goal-head"><div><div class="goal-item-title">${esc(goal.title)}</div><div class="goal-item-category">${esc(goal.category || '未設定')}</div></div><div style="color:#94a3b8;font-size:18px;">›</div></div><div class="goal-purpose">${esc(goal.purpose || '目的未設定')}</div><div class="chips"><span class="chip orange">タスク ${actions.length}件</span><span class="chip success">年達成率 ${yearStats.rate}%</span>${goal.targetDate ? `<span class="chip">期限 ${left !== null ? (left >= 0 ? `あと${left}日` : `${Math.abs(left)}日超過`) : '-'}</span>` : ''}</div></button>`;
     }).join('') : `<div class="empty">まだ目標がありません。まずは1つ登録して始めましょう。</div>`;
-    list.querySelectorAll('[data-goal-id]').forEach(btn => btn.addEventListener('click', () => {
-      state.selectedGoalId = btn.dataset.goalId; saveData('production-rebuild-select-goal'); resetActionForm(); render();
-    }));
+    list.querySelectorAll('[data-goal-id]').forEach(btn => btn.addEventListener('click', () => { state.selectedGoalId = btn.dataset.goalId; saveData('production-rebuild-select-goal'); resetActionForm(); render(); }));
   }
-
   function renderActionButtons(){
     const goal = selectedGoal(), actions = getScheduledActionsForDate(TODAY_STR, goal), wrap = el('actionGrid');
     if(!goal || !actions.length){ wrap.innerHTML = `<div class="empty" style="grid-column:1/-1;">今日対象のタスクはありません。繰り返し設定や開始日を見直してください。</div>`; return; }
@@ -661,9 +547,8 @@
       saveData('production-rebuild-toggle-action'); render();
     }));
   }
-
   function renderActionSettings(){
-    const goal = selectedGoal(); const list = el('actionSettingList');
+    const goal = selectedGoal(), list = el('actionSettingList');
     if(!goal || !(goal.actions || []).length){ list.innerHTML = `<div class="empty">タスクがまだありません。まずは1件追加してください。</div>`; return; }
     list.innerHTML = goal.actions.map(action => `
       <div class="task-item">
@@ -679,13 +564,9 @@
           </div>
           <div class="task-detail">${esc(getScheduleSummary(action))}</div>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button type="button" class="btn btn-outline" data-action-cmd="edit" data-action-id="${action.id}">編集</button>
-          <button type="button" class="btn btn-danger" data-action-cmd="delete" data-action-id="${action.id}">削除</button>
-        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;"><button type="button" class="btn btn-outline" data-action-cmd="edit" data-action-id="${action.id}">編集</button><button type="button" class="btn btn-danger" data-action-cmd="delete" data-action-id="${action.id}">削除</button></div>
       </div>`).join('');
   }
-
   function renderGraphs(){
     const goal = selectedGoal(), actions = currentActions(goal), bars = el('monthlyCategoryBars'), summary = el('actionSummaryList'), legend = el('categoryLegend');
     const year = state.viewYear, month = state.viewMonth, days = getDaysInMonth(year, month);
@@ -694,15 +575,14 @@
     legend.innerHTML = TASK_CATEGORIES.map(category => `<span class="legend-item"><span class="legend-dot" style="background:${getCategoryColor(category)}"></span>${category}</span>`).join('') + `<span class="legend-item"><span class="legend-dot" style="background:#e2e8f0"></span>未達 / 未設定</span>`;
     bars.style.gridTemplateColumns = `repeat(${days}, minmax(22px,1fr))`;
     bars.innerHTML = Array.from({length:days}, (_,i) => i+1).map(day => {
-      const ds = getDateStr(year, month, day); const scheduled = getScheduledActionsForDate(ds, goal); const total = scheduled.length; const doneIds = new Set(getDoneActions(ds, goal)); const doneTotal = total ? scheduled.filter(action => doneIds.has(action.id)).length : 0; const rate = total ? Math.round((doneTotal / total) * 100) : 0;
+      const ds = getDateStr(year, month, day), scheduled = getScheduledActionsForDate(ds, goal), total = scheduled.length, doneIds = new Set(getDoneActions(ds, goal)), doneTotal = total ? scheduled.filter(action => doneIds.has(action.id)).length : 0, rate = total ? Math.round((doneTotal / total) * 100) : 0;
       const segments = TASK_CATEGORIES.map(category => {
-        const catDone = total ? scheduled.filter(action => action.category === category && doneIds.has(action.id)).length : 0; const pct = total ? (catDone / total) * 100 : 0;
+        const catDone = total ? scheduled.filter(action => action.category === category && doneIds.has(action.id)).length : 0, pct = total ? (catDone / total) * 100 : 0;
         return pct > 0 ? `<div class="bar-segment" style="height:${pct}%;background:${getCategoryColor(category)}"></div>` : '';
       }).join('');
       const barHeight = rate > 0 ? `max(${rate}%, 14px)` : '6px';
       return `<div class="bar-col" title="${ds} / 達成率 ${rate}% / 実施 ${doneTotal} / 対象 ${total}"><div class="bar-value">${rate}%</div><div class="bar" style="height:${barHeight};opacity:${rate===0?.45:1};">${segments}</div><div class="bar-label">${day}</div></div>`;
     }).join('');
-
     if(!goal || !actions.length){ summary.innerHTML = `<div class="empty">タスクがないため、集計グラフを表示できません。</div>`; return; }
     const grouped = TASK_CATEGORIES.map(category => ({ category, items: actions.filter(action => action.category === category).sort((a,b) => { const diff = countActionThisMonth(b.id, goal, year, month) - countActionThisMonth(a.id, goal, year, month); return diff !== 0 ? diff : a.title.localeCompare(b.title, 'ja'); }) })).filter(group => group.items.length);
     const maxCount = Math.max(1, ...actions.map(a => countActionThisMonth(a.id, goal, year, month)));
@@ -711,43 +591,17 @@
       return `<div class="summary-group-title">${group.category}</div>${rows}`;
     }).join('');
   }
-
-  function renderHints(){
-    const goal = selectedGoal();
-    const monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
-    const yearStats = getYearStats(goal, state.viewYear);
-    const actions = currentActions(goal);
-    const lowExecution = [...actions].sort((a,b) => countActionThisMonth(a.id, goal, state.viewYear, state.viewMonth) - countActionThisMonth(b.id, goal, state.viewYear, state.viewMonth)).slice(0,2).filter(Boolean);
-    const hints = [
-      { title:'終了月はアーカイブとして固定閲覧', body:`${isMonthClosed(state.viewYear, state.viewMonth) ? 'この月は終了済みです。' : '今月は進行中です。'} 月が終わったらボタン化された履歴から即振り返れます。` },
-      { title:'月次CSVを定例資料のたたき台に', body:`表示月の実行ログをCSV出力できるので、月次レポートや週次報告への転記が楽になります。表示月の達成率は ${monthStats.rate}% です。` },
-      { title:'弱いタスクを先に見直す', body: lowExecution.length ? `表示月で実行回数が少ないのは ${lowExecution.map(a => `${a.title}（${countActionThisMonth(a.id, goal, state.viewYear, state.viewMonth)}回）`).join(' / ')} です。開始日・繰り返し・優先度の見直し候補です。` : 'まだ十分なログがないため、1か月使った後に実行回数の少ないタスクを見直すと効果的です。' },
-      { title:'年間で崩れた月を見つける', body:`${state.viewYear}年の年間達成率は ${yearStats.rate}%。最も良い月は ${yearStats.bestMonth ? `${yearStats.bestMonth.month+1}月（${yearStats.bestMonth.rate}%）` : '未判定'} です。` }
-    ];
-    el('hintList').innerHTML = hints.map(item => `<div class="hint-item"><strong>${esc(item.title)}</strong><div style="font-size:13px;color:#475569;line-height:1.7;">${esc(item.body)}</div></div>`).join('');
-  }
-
-  function refreshLocalMiniStatus(){
-    const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
-    el('localMiniStatus').innerHTML = `goals件数: ${goalsCount}<br>selectedGoalId: ${esc(state.selectedGoalId || '—')}<br>表示月: ${esc(getMonthTitle(state.viewYear, state.viewMonth))}<br>更新者: ${esc(state._updatedBy || '—')}`;
-  }
-
+  function refreshLocalMiniStatus(){ const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0; el('localMiniStatus').innerHTML = `goals件数: ${goalsCount}<br>selectedGoalId: ${esc(state.selectedGoalId || '—')}<br>表示月: ${esc(getMonthTitle(state.viewYear, state.viewMonth))}<br>更新者: ${esc(state._updatedBy || '—')}`; }
   function syncRepeatFieldVisibility(){ el('actionWeekdaysField').style.display = el('actionRepeatTypeInput').value === 'weekly' ? '' : 'none'; }
   function getSelectedRepeatDays(){ return Array.from(el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]:checked')).map(input => Number(input.value)).sort((a,b) => a-b); }
   function setSelectedRepeatDays(days=[]){ const values = new Set((days || []).map(v => Number(v))); el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = values.has(Number(input.value))); }
-
-  function resetActionForm(){
-    editingActionId = null; el('actionTitleInput').value = ''; el('actionDetailInput').value = ''; el('actionCategoryInput').value = '知性'; el('actionPriorityInput').value = '中'; el('actionRepeatTypeInput').value = 'daily'; setSelectedRepeatDays([]); el('actionStartDateInput').value = TODAY_STR; el('actionEndDateInput').value = ''; el('actionPausedInput').checked = false; el('saveActionBtn').textContent = '追加'; syncRepeatFieldVisibility();
-  }
-
+  function resetActionForm(){ editingActionId = null; el('actionTitleInput').value = ''; el('actionDetailInput').value = ''; el('actionCategoryInput').value = '知性'; el('actionPriorityInput').value = '中'; el('actionRepeatTypeInput').value = 'daily'; setSelectedRepeatDays([]); el('actionStartDateInput').value = TODAY_STR; el('actionEndDateInput').value = ''; el('actionPausedInput').checked = false; el('saveActionBtn').textContent = '追加'; syncRepeatFieldVisibility(); }
   function startEditAction(id){
     const action = (selectedGoal().actions || []).find(a => a.id === id); if(!action) return;
     editingActionId = id; el('actionTitleInput').value = action.title || ''; el('actionDetailInput').value = action.detail || ''; el('actionCategoryInput').value = action.category || '知性'; el('actionPriorityInput').value = action.priority || '中'; el('actionRepeatTypeInput').value = action.repeatType || 'daily'; setSelectedRepeatDays(action.repeatDays || []); el('actionStartDateInput').value = action.startDate || TODAY_STR; el('actionEndDateInput').value = action.endDate || ''; el('actionPausedInput').checked = !!action.paused; el('saveActionBtn').textContent = '更新'; syncRepeatFieldVisibility(); el('actionTitleInput').focus(); el('actionSettingToggle').open = true;
   }
-
   function saveActionFromForm(){
-    const goal = selectedGoal();
-    const title = el('actionTitleInput').value.trim(); const detail = el('actionDetailInput').value.trim(); const category = el('actionCategoryInput').value; const priority = el('actionPriorityInput').value; const repeatType = el('actionRepeatTypeInput').value; const repeatDays = getSelectedRepeatDays(); const startDate = el('actionStartDateInput').value || TODAY_STR; const endDate = el('actionEndDateInput').value; const paused = el('actionPausedInput').checked;
+    const goal = selectedGoal(), title = el('actionTitleInput').value.trim(), detail = el('actionDetailInput').value.trim(), category = el('actionCategoryInput').value, priority = el('actionPriorityInput').value, repeatType = el('actionRepeatTypeInput').value, repeatDays = getSelectedRepeatDays(), startDate = el('actionStartDateInput').value || TODAY_STR, endDate = el('actionEndDateInput').value, paused = el('actionPausedInput').checked;
     if(!title) return alert('タスク名を入力してください。');
     if(!detail) return alert('具体的に何をするかを入力してください。');
     if(repeatType === 'weekly' && !repeatDays.length) return alert('毎週を選んだ場合は曜日を1つ以上選択してください。');
@@ -755,16 +609,13 @@
     goal.actions = goal.actions || [];
     if(!editingActionId && goal.actions.length >= ACTION_MAX) return alert(`タスクは最大${ACTION_MAX}件までです。`);
     const payload = normalizeAction({ id: editingActionId || uid(), title, detail, category, priority, repeatType, repeatDays, startDate, endDate, paused });
-    if(editingActionId){ const target = goal.actions.find(a => a.id === editingActionId); if(target) Object.assign(target, payload); }
-    else { goal.actions.unshift(payload); }
+    if(editingActionId){ const target = goal.actions.find(a => a.id === editingActionId); if(target) Object.assign(target, payload); } else { goal.actions.unshift(payload); }
     saveData('production-rebuild-save-action'); resetActionForm(); render(); setStatus('タスク設定を保存しました。', 'ok');
   }
-
   function deleteAction(id){
-    const goal = selectedGoal(); const target = (goal.actions || []).find(a => a.id === id); const ok = confirm(`「${target?.title || 'このボタン'}」を削除しますか？`); if(!ok) return;
+    const goal = selectedGoal(), target = (goal.actions || []).find(a => a.id === id), ok = confirm(`「${target?.title || 'このボタン'}」を削除しますか？`); if(!ok) return;
     goal.actions = (goal.actions || []).filter(a => a.id !== id); Object.keys(goal.actionLogs || {}).forEach(ds => goal.actionLogs[ds] = (goal.actionLogs[ds] || []).filter(v => v !== id)); if(editingActionId === id) resetActionForm(); saveData('production-rebuild-delete-action'); render(); setStatus('タスクを削除しました。', 'warn');
   }
-
   function openGoalModal(goalId = null){
     editingGoalId = goalId;
     if(goalId){ const goal = state.goals.find(g => g.id === goalId); el('modalTitle').textContent = '目標を編集'; el('goalTitleInput').value = goal.title || ''; el('goalPurposeInput').value = goal.purpose || ''; el('goalValuesInput').value = goal.values || ''; el('goalRolesInput').value = goal.roles || ''; el('goalCategoryInput').value = goal.category || '仕事'; el('goalDateInput').value = goal.targetDate || ''; }
@@ -773,40 +624,31 @@
   }
   function closeGoalModal(){ editingGoalId = null; el('goalModal').classList.remove('show'); }
   function saveGoalFromModal(){
-    const title = el('goalTitleInput').value.trim(); const purpose = el('goalPurposeInput').value.trim(); const values = el('goalValuesInput').value.trim(); const roles = el('goalRolesInput').value.trim(); const category = el('goalCategoryInput').value; const targetDate = el('goalDateInput').value; if(!title) return alert('目標名を入力してください。');
+    const title = el('goalTitleInput').value.trim(), purpose = el('goalPurposeInput').value.trim(), values = el('goalValuesInput').value.trim(), roles = el('goalRolesInput').value.trim(), category = el('goalCategoryInput').value, targetDate = el('goalDateInput').value;
+    if(!title) return alert('目標名を入力してください。');
     if(editingGoalId){ const goal = state.goals.find(g => g.id === editingGoalId); Object.assign(goal, {title, purpose, values, roles, category, targetDate}); }
     else { const newGoal = {id:uid(), title, purpose, values, roles, category, targetDate, actions:[], actionLogs:{}}; state.goals.unshift(newGoal); state.selectedGoalId = newGoal.id; }
     saveData('production-rebuild-save-goal'); closeGoalModal(); render(); setStatus('目標を保存しました。', 'ok');
   }
-
   function downloadText(filename, text, mime='text/plain'){ const blob = new Blob([text], {type:mime}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
   function exportJson(){ downloadText(`SAFE-${APP_KEY}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`, JSON.stringify(state, null, 2), 'application/json'); setStatus('JSONエクスポートが完了しました。', 'ok'); }
   async function importJson(file){ const text = await file.text(); const data = JSON.parse(text); if(!data || !Array.isArray(data.goals)) throw new Error('goals を含むJSONではありません'); state = normalizeState(data); if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id; saveData('production-rebuild-import-json', { scheduleSync:false }); render(); setStatus('JSONインポートが完了しました。', 'ok'); }
-
   function exportMonthCsv(){
-    const goal = selectedGoal();
-    if(!goal) return setStatus('目標がないためCSVを出力できません。', 'warn');
-    const year = state.viewYear, month = state.viewMonth, days = getDaysInMonth(year, month);
-    const rows = [['date','goal','scheduled_count','done_count','rate','done_titles']];
+    const goal = selectedGoal(); if(!goal) return setStatus('目標がないためCSVを出力できません。', 'warn');
+    const year = state.viewYear, month = state.viewMonth, days = getDaysInMonth(year, month), rows = [['date','goal','scheduled_count','done_count','rate','done_titles']];
     for(let day=1; day<=days; day++){
-      const ds = getDateStr(year, month, day); const scheduled = getScheduledActionsForDate(ds, goal); const doneIds = new Set(getDoneActions(ds, goal)); const doneActions = scheduled.filter(action => doneIds.has(action.id)); const rate = scheduled.length ? Math.round((doneActions.length/scheduled.length)*100) : 0;
+      const ds = getDateStr(year, month, day), scheduled = getScheduledActionsForDate(ds, goal), doneIds = new Set(getDoneActions(ds, goal)), doneActions = scheduled.filter(action => doneIds.has(action.id)), rate = scheduled.length ? Math.round((doneActions.length/scheduled.length)*100) : 0;
       rows.push([ds, goal.title, scheduled.length, doneActions.length, rate, doneActions.map(v => v.title).join(' / ')]);
     }
     const csv = rows.map(row => row.map(cell => `"${String(cell ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
-    downloadText(`${year}-${pad(month+1)}_${goal.title}_月次ログ.csv`, csv, 'text/csv;charset=utf-8;');
-    setStatus(`${getMonthTitle(year, month)} のCSVを出力しました。`, 'ok');
+    downloadText(`${year}-${pad(month+1)}_${goal.title}_月次ログ.csv`, csv, 'text/csv;charset=utf-8;'); setStatus(`${getMonthTitle(year, month)} のCSVを出力しました。`, 'ok');
   }
-
   function exportYearJson(){
-    const goal = selectedGoal();
-    if(!goal) return setStatus('目標がないためJSONを出力できません。', 'warn');
-    const year = state.viewYear;
-    const filteredLogs = Object.fromEntries(Object.entries(goal.actionLogs || {}).filter(([ds]) => parseDateOnly(ds)?.getFullYear() === year));
+    const goal = selectedGoal(); if(!goal) return setStatus('目標がないためJSONを出力できません。', 'warn');
+    const year = state.viewYear, filteredLogs = Object.fromEntries(Object.entries(goal.actionLogs || {}).filter(([ds]) => parseDateOnly(ds)?.getFullYear() === year));
     const exportBody = { appVersion: APP_VERSION, exportedAt: new Date().toISOString(), year, goal: { ...goal, actionLogs: filteredLogs }, yearStats: getYearStats(goal, year) };
-    downloadText(`${year}_${goal.title}_年間アーカイブ.json`, JSON.stringify(exportBody, null, 2), 'application/json');
-    setStatus(`${year}年の年間JSONを出力しました。`, 'ok');
+    downloadText(`${year}_${goal.title}_年間アーカイブ.json`, JSON.stringify(exportBody, null, 2), 'application/json'); setStatus(`${year}年の年間JSONを出力しました。`, 'ok');
   }
-
   function loadConfig(){ try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; } }
   function saveConfig(){ const cfg = { projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''), anonKey:(el('anonKeyInput').value || '').trim() }; if(!cfg.projectUrl) throw new Error('Project URL を入力してください'); if(!cfg.anonKey) throw new Error('Anon Key を入力してください'); localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); setStatus('Supabase 設定を保存しました。', 'ok'); }
   function getConfig(){ const cfg = { projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''), anonKey:(el('anonKeyInput').value || '').trim() }; if(!cfg.projectUrl) throw new Error('Project URL を入力してください'); if(!cfg.anonKey) throw new Error('Anon Key を入力してください'); return cfg; }
@@ -814,7 +656,6 @@
   async function testConnection(){ setStatus('接続テスト中...', 'info'); await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`); setStatus('接続テスト成功', 'ok'); }
   async function fetchCloudState(){ const rows = await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key,payload,updated_at,updated_by,app_version&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`); const row = Array.isArray(rows) ? rows[0] : null; if(!row) return null; return { payload: row.payload || {}, updatedAt: row.updated_at || '', updatedBy: row.updated_by || '', appVersion: row.app_version || '' }; }
   function updateCloudSummary(info){ if(!info){ el('cloudSummary').innerHTML = '<div>クラウドgoals件数</div><div>未取得</div><div>クラウド最終更新</div><div>未取得</div><div>クラウド更新者</div><div>未取得</div><div>クラウドapp_version</div><div>未取得</div>'; return; } const count = Array.isArray(info.payload?.goals) ? info.payload.goals.length : (info.goalsCount ?? '未取得'); el('cloudSummary').innerHTML = `<div>クラウドgoals件数</div><div>${count}</div><div>クラウド最終更新</div><div>${info.updatedAt || '未取得'}</div><div>クラウド更新者</div><div>${esc(info.updatedBy || '未取得')}</div><div>クラウドapp_version</div><div>${esc(info.appVersion || '未取得')}</div>`; }
-
   async function syncToCloudInternal({interactive=true, skipConfirm=false, updatedBy='production-rebuild-v2-ui'} = {}){
     if(isSyncing) return false;
     const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
@@ -826,21 +667,17 @@
       const payload = structuredCloneSafe(state);
       await supabaseRequest('POST', `/rest/v1/${TABLE_NAME}?on_conflict=app_key`, { app_key: APP_KEY, payload, updated_at: payload._updatedAt, updated_by: payload._updatedBy, app_version: payload._appVersion });
       updateCloudSummary({payload, updatedAt: payload._updatedAt, updatedBy: payload._updatedBy, appVersion: payload._appVersion}); refreshLocalMiniStatus(); hasUnsyncedChanges = false; setSyncBadge('同期済み ' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'}), 'synced'); if(interactive) setStatus('クラウド同期が完了しました。', 'ok'); return true;
-    } catch(err) {
-      hasUnsyncedChanges = true; setSyncBadge('同期失敗', 'error'); if(interactive) throw err; console.error('auto sync failed', err); return false;
-    } finally { isSyncing = false; }
+    } catch(err) { hasUnsyncedChanges = true; setSyncBadge('同期失敗', 'error'); if(interactive) throw err; console.error('auto sync failed', err); return false; } finally { isSyncing = false; }
   }
-
   async function syncToCloud(){ return await syncToCloudInternal({interactive:true, skipConfirm:false, updatedBy:'production-rebuild-v2-ui-manual'}); }
   async function loadFromCloud({interactive=true} = {}){
     if(interactive){ const ok = confirm('クラウドの内容でローカルを上書きします。続行しますか？'); if(!ok) return false; setStatus('クラウド読込中...', 'info'); }
     const cloud = await fetchCloudState();
     if(!cloud){ updateCloudSummary(null); if(interactive) setStatus('クラウドにデータが見つかりませんでした。', 'warn'); setSyncBadge('クラウドデータなし', 'idle'); return false; }
-    const cloudGoals = Array.isArray(cloud.payload?.goals) ? cloud.payload.goals.length : 0; const localGoals = Array.isArray(state.goals) ? state.goals.length : 0;
+    const cloudGoals = Array.isArray(cloud.payload?.goals) ? cloud.payload.goals.length : 0, localGoals = Array.isArray(state.goals) ? state.goals.length : 0;
     if(interactive){ const ok2 = confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${cloud.updatedAt || '未取得'}\n\n続行しますか？`); if(!ok2) return false; }
     state = normalizeState(cloud.payload || structuredCloneSafe(initialData)); if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id; localStorage.setItem(APP_KEY, JSON.stringify(state)); render(); updateCloudSummary(cloud); hasUnsyncedChanges = false; setSyncBadge('クラウド読込完了', 'synced'); if(interactive) setStatus('クラウドからローカルへ反映しました。', 'ok'); return true;
   }
-
   async function bootstrapLatestState(){
     render(); updateCloudSummary(null); setSyncBadge('起動確認中...', 'syncing');
     const hasConfig = !!((el('projectUrlInput')?.value || '').trim() && (el('anonKeyInput')?.value || '').trim());
@@ -848,12 +685,11 @@
     try {
       const cloud = await fetchCloudState(); updateCloudSummary(cloud);
       if(!cloud?.payload){ setSyncBadge('クラウド未取得', 'idle'); setStatus('クラウドに保存済みデータが見つからないため、ローカル状態で起動しました。', 'ok'); return; }
-      const localTime = getIsoTime(state?._updatedAt); const cloudTime = getIsoTime(cloud.updatedAt || cloud.payload?._updatedAt);
+      const localTime = getIsoTime(state?._updatedAt), cloudTime = getIsoTime(cloud.updatedAt || cloud.payload?._updatedAt);
       if(cloudTime > localTime){ state = normalizeState(cloud.payload); if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id; localStorage.setItem(APP_KEY, JSON.stringify(state)); render(); setSyncBadge('クラウド最新を反映', 'synced'); setStatus('クラウドの方が新しかったため、自動で最新状態を反映しました。', 'ok'); }
       else { setSyncBadge('ローカル最新で起動', 'synced'); setStatus('ローカル最新状態で起動しました。', 'ok'); }
     } catch(err){ console.error(err); setSyncBadge('クラウド確認失敗', 'error'); setStatus('起動時のクラウド確認をスキップしました: ' + err.message, 'warn'); }
   }
-
   function bindEvents(){
     el('openGoalModalBtn').addEventListener('click', () => openGoalModal());
     el('closeGoalModalBtn').addEventListener('click', closeGoalModal);
@@ -883,14 +719,9 @@
     el('nextMonthBtn').addEventListener('click', () => { let y = state.viewYear, m = state.viewMonth + 1; if(m > 11){ y += 1; m = 0; } if(isMonthInFuture(y, m)) return; changeViewMonth(y, m); });
     el('backToCurrentBtn').addEventListener('click', () => changeViewMonth(CURRENT_YEAR, CURRENT_MONTH));
   }
-
-  function initSafeToggle(){ const toggle = el('actionSettingToggle'); const list = el('actionSettingList'); if(!toggle || !list) return; list.addEventListener('click', function(e){ const btn = e.target.closest('[data-action-cmd="edit"]'); if(btn) toggle.open = true; }); }
-
-  function render(){ renderStats(); renderViewNavigation(); renderGoalSummary(); renderActionSettings(); renderGraphs(); renderGoals(); renderActionButtons(); renderHints(); refreshLocalMiniStatus(); }
-
-  async function init(){
-    const cfg = loadConfig(); el('projectUrlInput').value = cfg.projectUrl || ''; el('anonKeyInput').value = cfg.anonKey || ''; bindEvents(); initSafeToggle(); resetActionForm(); await bootstrapLatestState();
-  }
+  function initSafeToggle(){ const toggle = el('actionSettingToggle'), list = el('actionSettingList'); if(!toggle || !list) return; list.addEventListener('click', function(e){ const btn = e.target.closest('[data-action-cmd="edit"]'); if(btn) toggle.open = true; }); }
+  function render(){ renderStats(); renderViewNavigation(); renderGoalSummary(); renderActionSettings(); renderGraphs(); renderGoals(); renderActionButtons(); refreshLocalMiniStatus(); }
+  async function init(){ const cfg = loadConfig(); el('projectUrlInput').value = cfg.projectUrl || ''; el('anonKeyInput').value = cfg.anonKey || ''; bindEvents(); initSafeToggle(); resetActionForm(); await bootstrapLatestState(); }
   init();
 })();
 </script>
