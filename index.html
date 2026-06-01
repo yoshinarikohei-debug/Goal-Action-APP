@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Goal Action Dashboard 本番再構築版</title>
+  <title>Goal Action Dashboard 年間運用版</title>
   <style>
     :root{
       --bg:#f8fafc;--card:#fff;--line:#e2e8f0;--text:#0f172a;--muted:#64748b;
@@ -13,7 +13,7 @@
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI","Meiryo UI","Meiryo",system-ui,sans-serif}
     button,input,select,textarea{font:inherit}
-    .container{max-width:1320px;margin:0 auto;padding:20px}
+    .container{max-width:1380px;margin:0 auto;padding:20px}
     .hero{background:linear-gradient(135deg,#0f172a,#1e293b 48%,#1d4ed8);color:#fff;border-radius:28px;padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
     .hero-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
     .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);font-size:12px;margin-bottom:10px}
@@ -24,49 +24,43 @@
     .section-title{font-size:20px;font-weight:800;margin-bottom:4px}.section-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6}
     .status{margin-top:14px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);font-size:13px}
     .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-    .stat-card{position:relative;overflow:hidden}
-    .stat-card.emphasis{background:#fff;color:#0f172a;border:1px solid #dbe3f0;box-shadow:none}
-    .stat-card.emphasis .stat-icon{background:#eff6ff}
-    .stat-card.emphasis .stat-label,.stat-card.emphasis .stat-sub{color:#64748b}
-    .stat-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-    .stat-trend{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
-    .stat-card:not(.emphasis) .stat-trend{background:#eff6ff;color:#1d4ed8}
-    .stat-progress{margin-top:12px;height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}
-    .stat-card:not(.emphasis) .stat-progress{background:#e2e8f0}
-    .stat-progress-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#93c5fd,#2563eb)}
-    .stat-card:not(.emphasis) .stat-progress-fill{background:linear-gradient(90deg,#60a5fa,#1d4ed8)}
-    .stat-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px;font-size:12px}
-    .stat-card.emphasis .stat-meta{color:#475569}
-    .stat-card:not(.emphasis) .stat-meta{color:#475569}
-    .stat-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#e2e8f0;font-size:20px;margin-bottom:12px}.stat-icon.blue{background:#dbeafe}.stat-label{font-size:12px;color:var(--muted);font-weight:700}.stat-value{font-size:28px;font-weight:800;margin-top:6px}.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
-    .dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:16px}
-    .center-stack{display:grid;gap:14px}
+    .stat-card{position:relative;overflow:hidden}.stat-card.emphasis{background:#fff;color:#0f172a;border:1px solid #dbe3f0;box-shadow:none}
+    .stat-card.emphasis .stat-icon{background:#eff6ff}.stat-card.emphasis .stat-label,.stat-card.emphasis .stat-sub{color:#64748b}
+    .stat-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.stat-trend{font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
+    .stat-progress{margin-top:12px;height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}.stat-progress-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#93c5fd,#2563eb)}
+    .stat-meta{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px;font-size:12px;color:#475569}
+    .stat-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#e2e8f0;font-size:20px;margin-bottom:12px}.stat-icon.blue{background:#dbeafe}
+    .stat-label{font-size:12px;color:var(--muted);font-weight:700}.stat-value{font-size:28px;font-weight:800;margin-top:6px}.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:16px}.center-stack{display:grid;gap:14px}
     .focus-card{border:1px solid var(--line);border-radius:22px;background:#fff;padding:18px}
     .goal-main-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px}
-    .goal-title{font-size:28px;font-weight:800;line-height:1.3}.goal-category{font-size:12px;color:var(--muted);margin-top:6px}
-    .counter-chip{font-size:12px;color:var(--muted);background:#f1f5f9;border-radius:999px;padding:6px 10px}
+    .goal-title{font-size:28px;font-weight:800;line-height:1.3}.goal-category{font-size:12px;color:var(--muted);margin-top:6px}.counter-chip{font-size:12px;color:var(--muted);background:#f1f5f9;border-radius:999px;padding:6px 10px}
     .mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.mini-box{border:1px solid var(--line);border-radius:16px;padding:14px}.mini-box .k{font-size:12px;color:var(--muted);font-weight:700}.mini-box .v{margin-top:8px;font-size:26px;font-weight:800}
-    .goal-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
-    .goal-meta-box{border:1px solid var(--line);border-radius:16px;padding:14px}.goal-meta-box .k{font-size:12px;color:var(--muted);font-weight:700}.goal-meta-box .v{margin-top:8px;font-size:14px;font-weight:700;line-height:1.6;white-space:pre-wrap}
-    .task-form{display:grid;gap:12px;margin-bottom:14px}.task-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.task-form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.task-weekdays{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}.weekday-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:#334155}.weekday-chip input{margin:0}.checkbox-row{display:flex;align-items:center;gap:8px;min-height:46px;padding:0 4px}.task-list{display:grid;gap:10px}.task-item{border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;justify-content:space-between;gap:14px;align-items:center;background:#fff}.task-left{display:grid;gap:6px}.task-title{font-size:15px;font-weight:700}.task-detail{font-size:13px;color:#475569;line-height:1.6}
-    .analysis-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px;margin-bottom:20px}.chart-card{border:1px solid var(--line);border-radius:22px;padding:14px;background:#fff}.chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 10px}.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#475569;font-weight:700}.legend-dot{width:10px;height:10px;border-radius:999px;display:inline-block}.bars-wrap{overflow-x:auto;padding-bottom:6px}.bars{min-width:760px;height:240px;display:grid;grid-template-columns:repeat(31,minmax(22px,1fr));align-items:end;gap:8px;padding:10px 0 28px;position:relative}.bars::before,.bars::after{content:'';position:absolute;left:0;right:0;border-top:1px dashed #cbd5e1}.bars::before{top:33%}.bars::after{top:66%}.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:end;gap:8px;height:100%}.bar{width:100%;max-width:28px;border-radius:12px 12px 4px 4px;background:#e2e8f0;min-height:6px;overflow:hidden;display:flex;flex-direction:column-reverse}.bar-segment{width:100%}.bar-label{font-size:10px;color:var(--muted)}.bar-value{font-size:10px;color:#334155;font-weight:700}
+    .goal-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.goal-meta-box{border:1px solid var(--line);border-radius:16px;padding:14px}.goal-meta-box .k{font-size:12px;color:var(--muted);font-weight:700}.goal-meta-box .v{margin-top:8px;font-size:14px;font-weight:700;line-height:1.6;white-space:pre-wrap}
+    .task-form{display:grid;gap:12px;margin-bottom:14px}.task-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.task-form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .task-weekdays{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}.weekday-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;color:#334155}.weekday-chip input{margin:0}
+    .checkbox-row{display:flex;align-items:center;gap:8px;min-height:46px;padding:0 4px}.task-list{display:grid;gap:10px}.task-item{border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;justify-content:space-between;gap:14px;align-items:center;background:#fff}.task-left{display:grid;gap:6px}.task-title{font-size:15px;font-weight:700}.task-detail{font-size:13px;color:#475569;line-height:1.6}
+    .analysis-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:16px;margin-bottom:20px}.chart-card{border:1px solid var(--line);border-radius:22px;padding:14px;background:#fff}.chart-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px}
+    .chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 10px}.legend-item{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#475569;font-weight:700}.legend-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .bars-wrap{overflow-x:auto;padding-bottom:6px}.bars{min-width:760px;height:240px;display:grid;grid-template-columns:repeat(31,minmax(22px,1fr));align-items:end;gap:8px;padding:10px 0 28px;position:relative}.bars::before,.bars::after{content:'';position:absolute;left:0;right:0;border-top:1px dashed #cbd5e1}.bars::before{top:33%}.bars::after{top:66%}
+    .bar-col{display:flex;flex-direction:column;align-items:center;justify-content:end;gap:8px;height:100%}.bar{width:100%;max-width:28px;border-radius:12px 12px 4px 4px;background:#e2e8f0;min-height:6px;overflow:hidden;display:flex;flex-direction:column-reverse}.bar-segment{width:100%}.bar-label{font-size:10px;color:var(--muted)}.bar-value{font-size:10px;color:#334155;font-weight:700}
     .summary-list{display:grid;gap:10px}.summary-group-title{font-size:12px;color:var(--muted);font-weight:800;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}.summary-group-title:first-child{margin-top:0;padding-top:0;border-top:none}.summary-row{display:grid;grid-template-columns:160px minmax(0,1fr) 52px;gap:10px;align-items:center}.summary-name{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.summary-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}.summary-fill{height:100%;border-radius:inherit}.summary-count{font-size:12px;color:var(--muted);text-align:right}
-    .execution-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.action-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
-    .action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.action-card{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px;cursor:pointer;transition:.2s ease;text-align:left;min-height:120px}.action-card:hover{transform:translateY(-1px)}.action-card.done{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-color:#2563eb;box-shadow:0 8px 18px rgba(37,99,235,.18)}
+    .execution-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.action-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.action-card{border:1px solid var(--line);background:#fff;border-radius:22px;padding:14px;cursor:pointer;transition:.2s ease;text-align:left;min-height:120px}.action-card:hover{transform:translateY(-1px)}.action-card.done{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border-color:#2563eb;box-shadow:0 8px 18px rgba(37,99,235,.18)}
     .action-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}.action-name{font-size:16px;font-weight:800}.action-detail{font-size:12px;line-height:1.6;opacity:.9;min-height:38px}.action-bottom{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;margin-top:10px}.tag{padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.16)}.tag.off{background:#f1f5f9;color:var(--muted)}
-    .focus-box{border-radius:24px;padding:18px;color:#fff;background:var(--primary)} .focus-box .date{font-size:13px;color:rgba(255,255,255,.8);margin-bottom:10px}.focus-box .rate{display:flex;align-items:end;gap:8px;margin:10px 0}.focus-box .rate strong{font-size:58px;line-height:1}.progress-track{width:100%;height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden}.progress-fill{height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);border-radius:inherit}.notice{border-radius:18px;background:#eef2ff;border:1px solid #c7d2fe;padding:14px}.notice h4{font-size:14px;margin-bottom:8px}
-    .goal-list{display:grid;gap:12px}.goal-card{width:100%;border:1px solid var(--line);background:#fff;border-radius:24px;padding:16px;text-align:left;cursor:pointer}.goal-card.active{border-color:var(--primary);box-shadow:0 8px 20px rgba(15,23,42,.08)}.goal-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.goal-item-title{font-size:17px;font-weight:800}.goal-item-category{font-size:12px;color:var(--muted)}.goal-purpose{font-size:13px;color:#475569;line-height:1.6;margin-bottom:10px}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{font-size:12px;padding:6px 10px;border-radius:999px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}.chip.orange{background:#ffedd5;color:#c2410c;border-color:#fed7aa}.chip.priority-high{background:#FEE2E2;color:#B91C1C;border-color:#FCA5A5}.chip.priority-medium{background:#FEF3C7;color:#92400E;border-color:#FCD34D}.chip.priority-low{background:#DBEAFE;color:#1D4ED8;border-color:#93C5FD}
-    .layout-bottom{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;margin-bottom:20px}
-.utility-toggle{margin-bottom:16px}.compact-settings-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.compact-card{padding:8px 0}.settings-flat{background:transparent;border:none;box-shadow:none;padding:0}.status-combined-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:12px}.status-box{border:1px solid var(--line);border-radius:18px;background:#f8fafc;padding:14px}.status-box-title{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:8px}.compact-kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 10px;font-size:13px}.compact-kv>div:nth-child(odd){color:var(--muted);font-weight:700}.compact-action-row{margin-bottom:12px}.settings-block{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;margin-top:10px}.settings-block-title{font-size:14px;font-weight:800;margin-bottom:10px}.json-actions{display:flex;gap:8px;flex-wrap:wrap}
-    .empty{border:1px dashed #cbd5e1;border-radius:22px;background:#f8fafc;color:var(--muted);text-align:center;padding:24px}
+    .goal-list{display:grid;gap:12px}.goal-card{width:100%;border:1px solid var(--line);background:#fff;border-radius:24px;padding:16px;text-align:left;cursor:pointer}.goal-card.active{border-color:var(--primary);box-shadow:0 8px 20px rgba(15,23,42,.08)}.goal-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.goal-item-title{font-size:17px;font-weight:800}.goal-item-category{font-size:12px;color:var(--muted)}.goal-purpose{font-size:13px;color:#475569;line-height:1.6;margin-bottom:10px}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{font-size:12px;padding:6px 10px;border-radius:999px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}.chip.orange{background:#ffedd5;color:#c2410c;border-color:#fed7aa}.chip.priority-high{background:#FEE2E2;color:#B91C1C;border-color:#FCA5A5}.chip.priority-medium{background:#FEF3C7;color:#92400E;border-color:#FCD34D}.chip.priority-low{background:#DBEAFE;color:#1D4ED8;border-color:#93C5FD}.chip.success{background:#dcfce7;color:#166534;border-color:#86efac}
+    .layout-bottom{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;margin-bottom:20px}.utility-toggle{margin-bottom:16px}.compact-settings-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.compact-card{padding:8px 0}.settings-flat{background:transparent;border:none;box-shadow:none;padding:0}.status-combined-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:12px}.status-box{border:1px solid var(--line);border-radius:18px;background:#f8fafc;padding:14px}.status-box-title{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:8px}.compact-kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 10px;font-size:13px}.compact-kv>div:nth-child(odd){color:var(--muted);font-weight:700}.compact-action-row{margin-bottom:12px}.settings-block{border:1px solid var(--line);border-radius:18px;background:#fff;padding:14px;margin-top:10px}.settings-block-title{font-size:14px;font-weight:800;margin-bottom:10px}.json-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .empty{border:1px dashed #cbd5e1;border-radius:22px;background:#f8fafc;color:var(--muted);text-align:center;padding:24px}.empty.small{padding:14px;font-size:13px}
     .modal{position:fixed;inset:0;background:rgba(2,6,23,.45);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:50}.modal.show{display:flex}.modal-box{width:100%;max-width:900px;background:#fff;border-radius:28px;padding:20px;box-shadow:0 20px 40px rgba(2,6,23,.18)}.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.span-2{grid-column:span 2}label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
     .input,.select,textarea{width:100%;border-radius:14px;border:1px solid var(--line);background:#fff;padding:12px 14px;outline:none} textarea{resize:vertical;min-height:88px}
     details.safe-toggle{border:1px solid var(--line);border-radius:22px;background:#fff;padding:22px;} details.safe-toggle>summary{list-style:none;cursor:pointer;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;} details.safe-toggle>summary::-webkit-details-marker{display:none;} .safe-toggle-meta{display:flex;flex-direction:column;gap:6px;} .safe-toggle-chip{display:inline-flex;align-items:center;justify-content:center;min-width:160px;padding:14px 18px;border:1px solid var(--primary);border-radius:18px;background:#fff;color:var(--primary);font-weight:800;} details.safe-toggle[open] .safe-toggle-chip::after{content:'閉じる';} details.safe-toggle:not([open]) .safe-toggle-chip::after{content:'開く';} .safe-toggle-body{margin-top:14px;}
-    .panel-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;margin-bottom:18px}.sync-panel .kv{grid-template-columns:110px 1fr}    .goal-edit-grid{display:grid;grid-template-columns:1.2fr .8fr auto;gap:10px;margin-top:10px}.muted{color:var(--muted)}
     .inline-actions{display:flex;gap:8px;flex-wrap:wrap}
-    @media (max-width:1140px){.stats{grid-template-columns:repeat(2,1fr)}.analysis-grid,.execution-grid,.layout-bottom,.panel-grid{grid-template-columns:1fr}.action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.task-form-grid{grid-template-columns:1fr 1fr}}
-    @media (max-width:820px){.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-grid{grid-template-columns:1fr}.span-2{grid-column:span 1}}
-    @media (max-width:720px){.container{padding:14px}.hero{padding:18px}.hero h1{font-size:24px}.stats,.action-grid,.mini-grid,.goal-meta-grid{grid-template-columns:1fr}.task-form-grid,.goal-edit-grid{grid-template-columns:1fr}.task-item{flex-direction:column;align-items:stretch}.bars{min-width:620px}}
+    .timeline-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;margin-bottom:18px}.archive-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.archive-btn{border:1px solid var(--line);background:#fff;border-radius:18px;padding:12px;text-align:left;cursor:pointer;transition:.2s ease}.archive-btn:hover{transform:translateY(-1px)}.archive-btn.active{border-color:#2563eb;box-shadow:0 8px 18px rgba(37,99,235,.12)}.archive-btn.closed{background:#f8fafc}.archive-btn.future{opacity:.45;cursor:not-allowed}.archive-btn .m{font-size:12px;color:var(--muted);margin-bottom:6px}.archive-btn .v{font-size:18px;font-weight:800}.archive-btn .s{font-size:12px;color:#475569;margin-top:4px}
+    .year-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.month-nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.month-title{font-size:22px;font-weight:800}.year-select{min-width:130px}
+    .year-summary-list{display:grid;gap:10px}.year-summary-row{display:grid;grid-template-columns:58px minmax(0,1fr) 70px;gap:10px;align-items:center}.year-summary-track{background:#e2e8f0;border-radius:999px;height:12px;overflow:hidden}.year-summary-fill{height:100%;background:linear-gradient(90deg,#60a5fa,#2563eb);border-radius:inherit}.hint-list{display:grid;gap:8px}.hint-item{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px}.hint-item strong{display:block;font-size:14px;margin-bottom:4px}.sync-status-badge{display:inline-flex;align-items:center;padding:10px 12px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;font-size:12px;font-weight:800}
+    @media (max-width:1140px){.stats{grid-template-columns:repeat(2,1fr)}.analysis-grid,.execution-grid,.layout-bottom,.timeline-grid{grid-template-columns:1fr}.action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.task-form-grid{grid-template-columns:1fr 1fr}.archive-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    @media (max-width:820px){.action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-grid{grid-template-columns:1fr}.span-2{grid-column:span 1}.archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:720px){.container{padding:14px}.hero{padding:18px}.hero h1{font-size:24px}.stats,.action-grid,.mini-grid,.goal-meta-grid{grid-template-columns:1fr}.task-form-grid{grid-template-columns:1fr}.task-item{flex-direction:column;align-items:stretch}.bars{min-width:620px}.archive-grid{grid-template-columns:1fr}.year-summary-row{grid-template-columns:44px minmax(0,1fr) 60px}}
   </style>
 </head>
 <body>
@@ -74,9 +68,9 @@
     <section class="hero">
       <div class="hero-top">
         <div>
-          <div class="pill">🚀 本番再構築版 / 元デザイン + 安全同期</div>
+          <div class="pill">🚀 年間運用版 / 元デザイン + 月次アーカイブ + 安全同期</div>
           <h1>目標管理ツール × アクションボード</h1>
-          <p>元デザインをベースに、復旧済みデータ・安全なローカル保存・Supabase 同期・JSON バックアップを統合した本番再構築版です。</p>
+          <p>年間で使い続けられるように、月別アーカイブ閲覧・月次/年次エクスポート・表示年月切替・年間サマリーを追加した本番運用版です。</p>
         </div>
         <div class="inline-actions">
           <button class="btn btn-primary" id="openGoalModalBtn">＋ 新しい目標を追加</button>
@@ -90,7 +84,7 @@
       <summary>
         <div class="safe-toggle-meta">
           <div class="section-title">設定</div>
-          <div class="section-sub" style="margin-bottom:0;">通常は閉じたまま使い、必要なときだけ開いて状態確認・同期設定・JSONバックアップを行います。</div>
+          <div class="section-sub" style="margin-bottom:0;">通常は閉じたまま使い、必要なときだけ開いて状態確認・同期設定・JSON/CSV出力を行います。</div>
         </div>
         <span class="safe-toggle-chip" aria-hidden="true">設定を</span>
       </summary>
@@ -103,7 +97,7 @@
                 <div class="compact-kv" style="margin-bottom:12px;">
                   <div>ローカル状態</div><div id="localMiniStatus">未読込</div>
                 </div>
-                <div class="kv compact-kv" id="cloudSummary"></div>
+                <div class="compact-kv" id="cloudSummary"></div>
               </div>
             </div>
             <div class="row compact-action-row" style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -113,7 +107,7 @@
             </div>
             <div class="settings-block">
               <div class="settings-block-title">同期設定</div>
-              <div class="kv" style="margin-bottom:12px;">
+              <div class="compact-kv" style="margin-bottom:12px;">
                 <div>Project URL</div><div><input class="input" id="projectUrlInput" type="text" placeholder="https://xxxx.supabase.co" /></div>
                 <div>Anon Key</div><div><textarea id="anonKeyInput" placeholder="eyJhbGciOi..."></textarea></div>
               </div>
@@ -123,10 +117,12 @@
               </div>
             </div>
             <div class="settings-block">
-              <div class="settings-block-title">JSONバックアップ</div>
-              <div class="section-sub" style="margin-bottom:12px;">念のための手動バックアップ / 復元をここにまとめています。</div>
+              <div class="settings-block-title">バックアップ / 出力</div>
+              <div class="section-sub" style="margin-bottom:12px;">日常運用は月次CSV、節目では年間JSONを出しておくと復旧しやすくなります。</div>
               <div class="json-actions">
                 <button class="btn btn-outline" id="btnExportTop">JSONエクスポート</button>
+                <button class="btn btn-outline" id="btnExportMonthCsvTop">表示月CSV</button>
+                <button class="btn btn-outline" id="btnExportYearJsonTop">表示年JSON</button>
                 <label for="fileImportTop" class="btn btn-outline" style="display:inline-flex;align-items:center;">JSONインポート</label>
                 <input id="fileImportTop" type="file" accept="application/json,.json" style="display:none;" />
               </div>
@@ -138,6 +134,30 @@
 
     <section class="stats" id="stats"></section>
 
+    <section class="timeline-grid">
+      <div class="card">
+        <div class="year-header">
+          <div>
+            <div class="section-title">年間ナビゲーション</div>
+            <div class="section-sub" style="margin-bottom:0;">終了済みの月はアーカイブとしてボタン化。クリックでその月の分析を即表示できます。</div>
+          </div>
+          <div class="month-nav">
+            <button class="btn btn-outline" id="prevMonthBtn">← 前月</button>
+            <select class="select year-select" id="viewYearSelect"></select>
+            <button class="btn btn-outline" id="nextMonthBtn">翌月 →</button>
+            <button class="btn btn-dark" id="backToCurrentBtn">今月へ戻る</button>
+          </div>
+        </div>
+        <div class="month-title" id="viewMonthTitle">2026年6月</div>
+        <div class="section-sub" id="viewMonthSub">表示月の履歴と達成状況を確認できます。</div>
+        <div class="archive-grid" id="archiveGrid"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">表示年サマリー</div>
+        <div class="section-sub">月別の達成率を年単位で俯瞰し、良かった月・崩れた月を早く把握できます。</div>
+        <div class="year-summary-list" id="yearSummaryList"></div>
+      </div>
+    </section>
 
     <section class="layout-bottom">
       <div class="card">
@@ -153,8 +173,6 @@
             <div class="action-head"><div style="font-size:14px;font-weight:800;">タスク一覧</div><div class="counter-chip" id="actionCounter">0 / 15</div></div>
             <div class="action-grid" id="actionGrid"></div>
           </div>
-</div>
-            </div>
         </div>
       </div>
     </section>
@@ -162,6 +180,11 @@
     <section class="dashboard-grid">
       <div class="center-stack">
         <div class="focus-card" id="goalSummaryArea"></div>
+        <div class="card">
+          <div class="section-title">運用しやすくする改善ポイント</div>
+          <div class="section-sub">年間利用を前提に、迷いにくい導線を先に実装しました。</div>
+          <div class="hint-list" id="hintList"></div>
+        </div>
         <details class="safe-toggle" id="actionSettingToggle">
           <summary>
             <div class="safe-toggle-meta">
@@ -197,13 +220,21 @@
 
     <section class="analysis-grid">
       <div class="chart-card">
-        <div class="section-title" style="font-size:18px;">月次の分析</div>
-        <div class="section-sub">日次達成率をカテゴリ別の積み上げで確認</div>
+        <div class="chart-toolbar">
+          <div>
+            <div class="section-title" style="font-size:18px;" id="monthlyAnalysisTitle">月次の分析</div>
+            <div class="section-sub" id="monthlyAnalysisSub">日次達成率をカテゴリ別の積み上げで確認</div>
+          </div>
+          <div class="inline-actions">
+            <button class="btn btn-outline" id="btnExportMonthCsv">この月をCSV出力</button>
+            <button class="btn btn-outline" id="btnExportYearJson">この年をJSON出力</button>
+          </div>
+        </div>
         <div class="chart-legend" id="categoryLegend"></div>
         <div class="bars-wrap"><div class="bars" id="monthlyCategoryBars"></div></div>
       </div>
       <div class="chart-card">
-        <div class="section-title" style="font-size:18px;">今月のタスク別実行回数</div>
+        <div class="section-title" style="font-size:18px;">表示月のタスク別実行回数</div>
         <div class="section-sub">カテゴリごとに並べ替えて、弱い習慣領域を把握</div>
         <div class="summary-list" id="actionSummaryList"></div>
       </div>
@@ -238,8 +269,9 @@
   const CONFIG_KEY = 'goal-action-sync-config';
   const TABLE_NAME = 'app_sync_state';
   const ACTION_MAX = 15;
-  const APP_VERSION = 'production-rebuild-v1-repeat-v1';
+  const APP_VERSION = 'production-rebuild-v2-annual-archive';
   const TASK_CATEGORIES = ['肉体','社会・情緒','知性','精神'];
+  const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const CATEGORY_META = {
     '肉体': { color: '#22c55e' },
     '社会・情緒': { color: '#f59e0b' },
@@ -252,11 +284,13 @@
   let isSyncing = false;
   const uid = () => Math.random().toString(36).slice(2, 10);
   const pad = (n) => String(n).padStart(2, '0');
-  const getTodayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+  const ACTUAL_TODAY = new Date();
+  const CURRENT_YEAR = ACTUAL_TODAY.getFullYear();
+  const CURRENT_MONTH = ACTUAL_TODAY.getMonth();
+  const TODAY_STR = `${CURRENT_YEAR}-${pad(CURRENT_MONTH+1)}-${pad(ACTUAL_TODAY.getDate())}`;
+  const esc = (str='') => String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
   const getDateStr = (y,m,d) => `${y}-${pad(m+1)}-${pad(d)}`;
   const getDaysInMonth = (y,m) => new Date(y,m+1,0).getDate();
-  const esc = (str='') => String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-  const now = new Date(), CURRENT_YEAR = now.getFullYear(), CURRENT_MONTH = now.getMonth(), TODAY_STR = getTodayStr();
 
   const seedActions = [
     {id:uid(),title:'AIトレ',detail:'AI活用の学習または実践を15分以上進める',priority:'高',category:'知性',repeatType:'daily',repeatDays:[],startDate:TODAY_STR,endDate:'',paused:false},
@@ -268,6 +302,8 @@
 
   const initialData = {
     selectedGoalId:null,
+    viewYear: CURRENT_YEAR,
+    viewMonth: CURRENT_MONTH,
     goals:[{
       id:uid(),
       title:'2026年上期の重点目標',
@@ -276,36 +312,27 @@
       roles:'自分：学び続ける / 仕事：価値を出す / 家庭：整える',
       category:'仕事',
       targetDate:'2026-06-30',
-      notes:'添付のように、目標の設計情報を右側にまとめて見る構成にする。',
+      notes:'年間で使い続けるため、終了した月を振り返れる構成にする。',
       actions:seedActions,
       actionLogs:{
         [TODAY_STR]:[seedActions[0].id, seedActions[2].id],
-        [getDateStr(CURRENT_YEAR,CURRENT_MONTH,Math.max(1,now.getDate()-1))]:[seedActions[0].id, seedActions[1].id, seedActions[2].id],
-        [getDateStr(CURRENT_YEAR,CURRENT_MONTH,Math.max(1,now.getDate()-2))]:[seedActions[0].id, seedActions[4].id]
+        [getDateStr(CURRENT_YEAR,CURRENT_MONTH,Math.max(1,ACTUAL_TODAY.getDate()-1))]:[seedActions[0].id, seedActions[1].id, seedActions[2].id],
+        [getDateStr(CURRENT_YEAR,CURRENT_MONTH,Math.max(1,ACTUAL_TODAY.getDate()-2))]:[seedActions[0].id, seedActions[4].id]
       }
     }]
   };
 
-  let state = loadData();
-  if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id;
   let editingGoalId = null;
   let editingActionId = null;
-
   const el = (id) => document.getElementById(id);
 
-  function setStatus(message, kind='info'){
-    const box = el('statusBox');
-    const map = {
-      info:['rgba(255,255,255,.12)','rgba(255,255,255,.22)','#fff'],
-      ok:['rgba(16,185,129,.18)','rgba(167,243,208,.45)','#eafff6'],
-      warn:['rgba(245,158,11,.18)','rgba(253,230,138,.45)','#fff9eb'],
-      error:['rgba(220,38,38,.18)','rgba(254,202,202,.45)','#fff5f5']
-    };
-    const [bg, bd, tx] = map[kind] || map.info;
-    box.style.background = bg;
-    box.style.border = '1px solid ' + bd;
-    box.style.color = tx;
-    box.textContent = message;
+  function structuredCloneSafe(obj){ return JSON.parse(JSON.stringify(obj)); }
+
+  function parseDateOnly(dateStr){
+    if(!dateStr) return null;
+    const parts = String(dateStr).split('-').map(Number);
+    if(parts.length !== 3 || parts.some(v => Number.isNaN(v))) return null;
+    return new Date(parts[0], parts[1]-1, parts[2]);
   }
 
   function normalizeAction(action={}){
@@ -329,39 +356,88 @@
   }
 
   function normalizeGoal(goal={}){
-    return { ...goal, actions: Array.isArray(goal.actions) ? goal.actions.map(normalizeAction) : [], actionLogs: goal.actionLogs && typeof goal.actionLogs === 'object' ? goal.actionLogs : {} };
+    return {
+      ...goal,
+      actions: Array.isArray(goal.actions) ? goal.actions.map(normalizeAction) : [],
+      actionLogs: goal.actionLogs && typeof goal.actionLogs === 'object' ? goal.actionLogs : {}
+    };
   }
 
   function normalizeState(data){
-    const base = data && typeof data === 'object' ? data : structuredClone(initialData);
-    const goals = Array.isArray(base.goals) ? base.goals.map(normalizeGoal) : structuredClone(initialData.goals).map(normalizeGoal);
+    const base = data && typeof data === 'object' ? data : structuredCloneSafe(initialData);
+    const goals = Array.isArray(base.goals) ? base.goals.map(normalizeGoal) : structuredCloneSafe(initialData.goals).map(normalizeGoal);
     const selectedGoalId = base.selectedGoalId || goals[0]?.id || null;
-    return { ...base, goals, selectedGoalId };
+    const viewYear = Number.isInteger(Number(base.viewYear)) ? Number(base.viewYear) : CURRENT_YEAR;
+    const vm = Number(base.viewMonth);
+    const viewMonth = Number.isInteger(vm) && vm >= 0 && vm <= 11 ? vm : CURRENT_MONTH;
+    return { ...base, goals, selectedGoalId, viewYear, viewMonth };
   }
 
   function loadData(){
     try{
       const raw = localStorage.getItem(APP_KEY);
-      if(!raw) return normalizeState(structuredClone(initialData));
+      if(!raw) return normalizeState(structuredCloneSafe(initialData));
       const parsed = JSON.parse(raw);
-      if(!parsed || !Array.isArray(parsed.goals)) throw new Error('invalid state');
       return normalizeState(parsed);
     } catch(e){
-      return normalizeState(structuredClone(initialData));
+      return normalizeState(structuredCloneSafe(initialData));
     }
   }
 
-  function parseDateOnly(dateStr){
-    if(!dateStr) return null;
-    const parts = String(dateStr).split('-').map(Number);
-    if(parts.length !== 3 || parts.some(v => Number.isNaN(v))) return null;
-    return new Date(parts[0], parts[1]-1, parts[2]);
+  let state = loadData();
+  if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id;
+
+  function setStatus(message, kind='info'){
+    const box = el('statusBox');
+    const map = {
+      info:['rgba(255,255,255,.12)','rgba(255,255,255,.22)','#fff'],
+      ok:['rgba(16,185,129,.18)','rgba(167,243,208,.45)','#eafff6'],
+      warn:['rgba(245,158,11,.18)','rgba(253,230,138,.45)','#fff9eb'],
+      error:['rgba(220,38,38,.18)','rgba(254,202,202,.45)','#fff5f5']
+    };
+    const [bg, bd, tx] = map[kind] || map.info;
+    box.style.background = bg; box.style.border = '1px solid ' + bd; box.style.color = tx; box.textContent = message;
   }
+
+  function setSyncBadge(message, status='idle'){
+    const badge = el('syncStatusBadge');
+    if(!badge) return;
+    badge.textContent = message;
+    badge.dataset.status = status;
+  }
+
+  function saveData(updatedBy='production-rebuild-local-save', options={}){
+    const { scheduleSync = true, refresh = true } = options;
+    state._updatedAt = new Date().toISOString();
+    state._updatedBy = updatedBy;
+    state._appVersion = APP_VERSION;
+    localStorage.setItem(APP_KEY, JSON.stringify(state));
+    if(refresh) refreshLocalMiniStatus();
+    if(scheduleSync) scheduleAutoSync();
+    else setSyncBadge('ローカル保存済み', 'idle');
+  }
+
+  function scheduleAutoSync(){
+    hasUnsyncedChanges = true;
+    setSyncBadge('保存済み / 自動同期待ち', 'saving');
+    if(autoSyncTimer) clearTimeout(autoSyncTimer);
+    autoSyncTimer = setTimeout(async () => {
+      await syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-v2-auto-sync'});
+    }, AUTO_SYNC_DELAY);
+  }
+
+  function getIsoTime(value){ const t = new Date(value || '').getTime(); return Number.isNaN(t) ? 0 : t; }
+  function selectedGoal(){ return state.goals.find(g => g.id === state.selectedGoalId) || state.goals[0] || null; }
+  function currentActions(goal = selectedGoal()){ return goal?.actions || []; }
+  function currentLogs(goal = selectedGoal()){ return goal?.actionLogs || {}; }
+  function getDoneActions(ds, goal = selectedGoal()){ return currentLogs(goal)[ds] || []; }
+  function isActionDone(ds, id, goal = selectedGoal()){ return getDoneActions(ds, goal).includes(id); }
+  function getCategoryColor(category){ return CATEGORY_META[category]?.color || '#2563eb'; }
+  function daysLeft(dateStr){ if(!dateStr) return null; const today = new Date(); const target = new Date(dateStr); const base = new Date(today.getFullYear(), today.getMonth(), today.getDate()); return Math.ceil((target - base) / (1000*60*60*24)); }
 
   function isActionScheduledForDate(action, ds){
     if(!action || action.paused) return false;
-    const target = parseDateOnly(ds);
-    if(!target) return false;
+    const target = parseDateOnly(ds); if(!target) return false;
     const start = parseDateOnly(action.startDate) || parseDateOnly(TODAY_STR);
     const end = parseDateOnly(action.endDate);
     if(start && target < start) return false;
@@ -381,13 +457,28 @@
     }
   }
 
-  function getScheduledActionsForDate(ds, goal = selectedGoal()){
-    return currentActions(goal).filter(action => isActionScheduledForDate(action, ds));
-  }
-
+  function getScheduledActionsForDate(ds, goal = selectedGoal()){ return currentActions(goal).filter(action => isActionScheduledForDate(action, ds)); }
   function getDoneCountForDate(ds, goal = selectedGoal()){
     const scheduledIds = new Set(getScheduledActionsForDate(ds, goal).map(action => action.id));
     return getDoneActions(ds, goal).filter(id => scheduledIds.has(id)).length;
+  }
+  function calcActionRate(ds, goal = selectedGoal()){ const actions = getScheduledActionsForDate(ds, goal); if(!actions.length) return 0; return Math.round((getDoneCountForDate(ds, goal) / actions.length) * 100); }
+  function countActionThisMonth(id, goal = selectedGoal(), year = state.viewYear, month = state.viewMonth){
+    const action = currentActions(goal).find(v => v.id === id); if(!action) return 0;
+    return Array.from({length:getDaysInMonth(year, month)}, (_,i)=>i+1)
+      .map(day => getDateStr(year, month, day))
+      .filter(ds => isActionScheduledForDate(action, ds) && isActionDone(ds, id, goal)).length;
+  }
+
+  function calcActionStreak(id, goal = selectedGoal()){
+    const action = currentActions(goal).find(v => v.id === id); if(!action) return 0;
+    let streak = 0; const cursor = new Date();
+    for(let i=0;i<366;i++){
+      const ds = `${cursor.getFullYear()}-${pad(cursor.getMonth()+1)}-${pad(cursor.getDate())}`;
+      if(isActionScheduledForDate(action, ds)){ if(isActionDone(ds, id, goal)) streak++; else break; }
+      cursor.setDate(cursor.getDate()-1);
+    }
+    return streak;
   }
 
   function getRepeatLabel(action){
@@ -395,190 +486,132 @@
       case 'once': return '単発';
       case 'daily': return '毎日';
       case 'weekday': return '平日';
-      case 'weekly': {
-        const map = ['日','月','火','水','木','金','土'];
-        const days = (action.repeatDays || []).map(v => map[v]).join('・');
-        return days ? `毎週（${days}）` : '毎週';
-      }
+      case 'weekly': { const map = ['日','月','火','水','木','金','土']; const days = (action.repeatDays || []).map(v => map[v]).join('・'); return days ? `毎週（${days}）` : '毎週'; }
       case 'monthly': return '毎月';
       default: return '毎日';
     }
   }
+  function getScheduleSummary(action){ const range = [action.startDate || '開始日未設定', action.endDate || '終了日なし'].join(' 〜 '); const paused = action.paused ? ' / 一時停止中' : ''; return `${getRepeatLabel(action)} / ${range}${paused}`; }
 
-  function getScheduleSummary(action){
-    const range = [action.startDate || '開始日未設定', action.endDate || '終了日なし'].join(' 〜 ');
-    const paused = action.paused ? ' / 一時停止中' : '';
-    return `${getRepeatLabel(action)} / ${range}${paused}`;
+  function getMonthTitle(year = state.viewYear, month = state.viewMonth){ return `${year}年${month+1}月`; }
+  function isMonthInFuture(year, month){ return year > CURRENT_YEAR || (year === CURRENT_YEAR && month > CURRENT_MONTH); }
+  function isMonthClosed(year, month){ return year < CURRENT_YEAR || (year === CURRENT_YEAR && month < CURRENT_MONTH); }
+
+  function getMonthStats(goal = selectedGoal(), year = state.viewYear, month = state.viewMonth){
+    const days = getDaysInMonth(year, month);
+    let scheduledTotal = 0, doneTotal = 0, activeDays = 0, loggedDays = 0;
+    for(let day=1; day<=days; day++){
+      const ds = getDateStr(year, month, day);
+      const scheduled = getScheduledActionsForDate(ds, goal);
+      const done = getDoneCountForDate(ds, goal);
+      scheduledTotal += scheduled.length;
+      doneTotal += done;
+      if(scheduled.length > 0) activeDays++;
+      if(done > 0) loggedDays++;
+    }
+    const rate = scheduledTotal ? Math.round((doneTotal / scheduledTotal) * 100) : 0;
+    return { year, month, days, scheduledTotal, doneTotal, activeDays, loggedDays, rate };
   }
 
-  function getCategoryColor(category){
-    return CATEGORY_META[category]?.color || '#2563eb';
+  function getYearStats(goal = selectedGoal(), year = state.viewYear){
+    let totalScheduled = 0, totalDone = 0, activeMonths = 0, bestMonth = null;
+    const months = Array.from({length:12}, (_,month) => {
+      const stats = getMonthStats(goal, year, month);
+      totalScheduled += stats.scheduledTotal; totalDone += stats.doneTotal;
+      if(stats.scheduledTotal > 0 || stats.doneTotal > 0) activeMonths++;
+      if(!bestMonth || stats.rate > bestMonth.rate) bestMonth = stats;
+      return stats;
+    });
+    return { year, totalScheduled, totalDone, activeMonths, rate: totalScheduled ? Math.round((totalDone/totalScheduled)*100) : 0, bestMonth, months };
   }
 
-  function setSyncBadge(message, status='idle'){
-    const badge = el('syncStatusBadge');
-    if(!badge) return;
-    badge.textContent = message;
-    badge.dataset.status = status;
+  function getAvailableYears(){
+    const years = new Set([CURRENT_YEAR]);
+    (state.goals || []).forEach(goal => {
+      Object.keys(goal.actionLogs || {}).forEach(ds => {
+        const d = parseDateOnly(ds); if(d) years.add(d.getFullYear());
+      });
+      (goal.actions || []).forEach(action => {
+        const s = parseDateOnly(action.startDate); const e = parseDateOnly(action.endDate);
+        if(s) years.add(s.getFullYear()); if(e) years.add(e.getFullYear());
+      });
+    });
+    return Array.from(years).sort((a,b)=>a-b);
   }
 
-  function scheduleAutoSync(){
-    hasUnsyncedChanges = true;
-    setSyncBadge('保存済み / 自動同期待ち', 'saving');
-    if(autoSyncTimer) clearTimeout(autoSyncTimer);
-    autoSyncTimer = setTimeout(async () => {
-      await syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-v1-auto-sync'});
-    }, AUTO_SYNC_DELAY);
-  }
-
-  function saveData(updatedBy='production-rebuild-local-save', options={}){
-    const { scheduleSync = true, refresh = true } = options;
-    state._updatedAt = new Date().toISOString();
-    state._updatedBy = updatedBy;
-    state._appVersion = APP_VERSION;
-    localStorage.setItem(APP_KEY, JSON.stringify(state));
-    if(refresh) refreshLocalMiniStatus();
-    if(scheduleSync) scheduleAutoSync();
-    else setSyncBadge('ローカル保存済み', 'idle');
-  }
-
-
-  function getIsoTime(value){
-    const t = new Date(value || '').getTime();
-    return Number.isNaN(t) ? 0 : t;
-  }
-
-  async function bootstrapLatestState(){
+  function changeViewMonth(year, month){
+    const y = Number(year), m = Number(month);
+    if(!Number.isInteger(y) || !Number.isInteger(m) || m < 0 || m > 11) return;
+    if(isMonthInFuture(y, m)) return;
+    state.viewYear = y; state.viewMonth = m;
+    saveData('production-rebuild-view-month', { scheduleSync:false, refresh:true });
     render();
-    updateCloudSummary(null);
-    setSyncBadge('起動確認中...', 'syncing');
-
-    const hasConfig = !!((el('projectUrlInput')?.value || '').trim() && (el('anonKeyInput')?.value || '').trim());
-    if(!hasConfig){
-      setSyncBadge('ローカル運用中', 'offline');
-      setStatus('Supabase設定未入力のため、ローカル状態で起動しました。', 'warn');
-      return;
-    }
-
-    try {
-      const cloud = await fetchCloudState();
-      updateCloudSummary(cloud);
-      if(!cloud?.payload){
-        setSyncBadge('クラウド未取得', 'idle');
-        setStatus('クラウドに保存済みデータが見つからないため、ローカル状態で起動しました。', 'ok');
-        return;
-      }
-
-      const localTime = getIsoTime(state?._updatedAt);
-      const cloudTime = getIsoTime(cloud.updatedAt || cloud.payload?._updatedAt);
-
-      if(cloudTime > localTime){
-        state = normalizeState(cloud.payload);
-        if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id;
-        localStorage.setItem(APP_KEY, JSON.stringify(state));
-        render();
-        setSyncBadge('クラウド最新を反映', 'synced');
-        setStatus('クラウドの方が新しかったため、自動で最新状態を反映しました。', 'ok');
-      } else {
-        setSyncBadge('ローカル最新で起動', 'synced');
-        setStatus('ローカル最新状態で起動しました。', 'ok');
-      }
-    } catch(err){
-      console.error(err);
-      setSyncBadge('クラウド確認失敗', 'error');
-      setStatus('起動時のクラウド確認をスキップしました: ' + err.message, 'warn');
-    }
-  }
-
-  function selectedGoal(){
-    return state.goals.find(g => g.id === state.selectedGoalId) || state.goals[0] || null;
-  }
-  function currentActions(goal = selectedGoal()){
-    return goal?.actions || [];
-  }
-  function currentLogs(goal = selectedGoal()){
-    return goal?.actionLogs || {};
-  }
-  function getDoneActions(ds, goal = selectedGoal()){
-    return currentLogs(goal)[ds] || [];
-  }
-  function isActionDone(ds, id, goal = selectedGoal()){
-    return getDoneActions(ds, goal).includes(id);
-  }
-  function calcActionRate(ds, goal = selectedGoal()){
-    const actions = getScheduledActionsForDate(ds, goal);
-    if(!actions.length) return 0;
-    return Math.round((getDoneCountForDate(ds, goal) / actions.length) * 100);
-  }
-
-  function calcActionStreak(id, goal = selectedGoal()){
-    const action = currentActions(goal).find(v => v.id === id);
-    if(!action) return 0;
-    let streak = 0;
-    const cursor = new Date();
-    for(let i=0;i<365;i++){
-      const ds = `${cursor.getFullYear()}-${pad(cursor.getMonth()+1)}-${pad(cursor.getDate())}`;
-      if(isActionScheduledForDate(action, ds)){
-        if(isActionDone(ds, id, goal)) streak++;
-        else break;
-      }
-      cursor.setDate(cursor.getDate()-1);
-    }
-    return streak;
-  }
-
-  function daysLeft(dateStr){
-    if(!dateStr) return null;
-    const today = new Date(), target = new Date(dateStr), base = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    return Math.ceil((target - base) / (1000*60*60*24));
-  }
-  function countActionThisMonth(id, goal = selectedGoal()){
-    const action = currentActions(goal).find(v => v.id === id);
-    if(!action) return 0;
-    return Array.from({length:getDaysInMonth(CURRENT_YEAR,CURRENT_MONTH)}, (_,i)=>i+1)
-      .map(day => getDateStr(CURRENT_YEAR, CURRENT_MONTH, day))
-      .filter(ds => isActionScheduledForDate(action, ds) && isActionDone(ds, id, goal)).length;
-  }
-
-  function refreshLocalMiniStatus(){
-    const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
-    el('localMiniStatus').innerHTML = `goals件数: ${goalsCount}<br>selectedGoalId: ${esc(state.selectedGoalId || '—')}<br>更新者: ${esc(state._updatedBy || '—')}`;
+    setStatus(`${getMonthTitle(y,m)} を表示しています。`, 'ok');
   }
 
   function renderStats(){
-    const goal = selectedGoal(), actions = currentActions(goal), todayActions = getScheduledActionsForDate(TODAY_STR, goal), todayRate = calcActionRate(TODAY_STR, goal), todayDoneCount = getDoneCountForDate(TODAY_STR, goal);
-    const avgProgress = state.goals.length ? Math.round(state.goals.reduce((a,g) => a + calcActionRate(TODAY_STR, g), 0) / state.goals.length) : 0;
+    const goal = selectedGoal();
+    const actions = currentActions(goal);
+    const todayActions = getScheduledActionsForDate(TODAY_STR, goal);
+    const todayRate = calcActionRate(TODAY_STR, goal);
+    const todayDoneCount = getDoneCountForDate(TODAY_STR, goal);
+    const monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
+    const yearStats = getYearStats(goal, state.viewYear);
     const bestStreak = actions.length ? Math.max(...actions.map(a => calcActionStreak(a.id, goal))) : 0;
-    const activeDays = Array.from({length:getDaysInMonth(CURRENT_YEAR,CURRENT_MONTH)}, (_,i)=>i+1).map(day => getDateStr(CURRENT_YEAR,CURRENT_MONTH,day)).filter(ds => getDoneCountForDate(ds, goal) > 0).length;
-    const avgDoneGoals = state.goals.length ? state.goals.filter(g => calcActionRate(TODAY_STR, g) >= avgProgress).length : 0;
+    const bestMonthLabel = yearStats.bestMonth ? `${yearStats.bestMonth.month+1}月` : '—';
     el('stats').innerHTML = [
-      ['📈','blue','今日の達成率',`${todayRate}%`,`${todayDoneCount}/${todayActions.length} タスク`,'今日やる設定のうち、完了した割合','本日',`${todayRate}%`,true],
-      ['🎯','','平均達成率',`${avgProgress}%`,'全目標の平均','全目標を均した進み具合','全体平均',`${avgDoneGoals}/${state.goals.length || 0} 目標が平均以上`,true],
-      ['🔥','','最長継続',`${bestStreak}日`,'選択目標の最長継続','','','',false],
-      ['📅','','稼働日数',`${activeDays}日`,'今月ログが入った日数','','','',false]
-    ].map(([emoji,color,label,value,sub,metaLeft,metaRight,trend,isEmphasis]) => `
+      ['📈','blue','今日の達成率',`${todayRate}%`,`${todayDoneCount}/${todayActions.length} タスク`,'本日',TODAY_STR,Math.max(0, Math.min(100, todayRate)),true],
+      ['🗓️','','表示月の達成率',`${monthStats.rate}%`,`${monthStats.doneTotal}/${monthStats.scheduledTotal} 実行`,'表示月',getMonthTitle(state.viewYear, state.viewMonth),monthStats.rate,true],
+      ['🧭','','表示年の達成率',`${yearStats.rate}%`,`${yearStats.totalDone}/${yearStats.totalScheduled} 実行`,'年間稼働月',`${yearStats.activeMonths}ヶ月`,yearStats.rate,true],
+      ['🔥','','最長継続',`${bestStreak}日`,`ベスト月 ${bestMonthLabel}`,'継続',`登録 ${actions.length}件`,0,false]
+    ].map(([emoji,color,label,value,sub,metaLeft,metaRight,progress,isEmphasis]) => `
       <div class="card stat-card ${isEmphasis ? 'emphasis' : ''}">
         <div class="stat-card-head">
           <div>
             <div class="stat-icon ${color}">${emoji}</div>
             <div class="stat-label">${label}</div>
           </div>
-          ${isEmphasis ? `<div class="stat-trend">${trend}</div>` : ''}
+          ${isEmphasis ? `<div class="stat-trend">${metaRight}</div>` : ''}
         </div>
         <div class="stat-value">${value}</div>
         <div class="stat-sub">${sub}</div>
-        ${isEmphasis ? `<div class="stat-progress"><div class="stat-progress-fill" style="width:${Math.max(0, Math.min(100, Number(value.replace('%','')) || 0))}%"></div></div><div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>` : ''}
-      </div>
-    `).join('');    el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
+        ${isEmphasis ? `<div class="stat-progress"><div class="stat-progress-fill" style="width:${progress}%"></div></div><div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>` : `<div class="stat-meta"><span>${metaLeft}</span><span>${metaRight}</span></div>`}
+      </div>`).join('');
+    el('actionCounter').textContent = `今日 ${todayActions.length} / 登録 ${actions.length}`;
     el('actionCounterInline').textContent = `登録 ${actions.length} / ${ACTION_MAX} 件`;
   }
 
+  function renderViewNavigation(){
+    el('viewMonthTitle').textContent = getMonthTitle(state.viewYear, state.viewMonth);
+    const summaryType = isMonthClosed(state.viewYear, state.viewMonth) ? 'アーカイブ閲覧中' : '進行中の月';
+    el('viewMonthSub').textContent = `${summaryType}。終了した月は固定的に振り返り、今月は日々更新されます。`;
+
+    const yearSelect = el('viewYearSelect');
+    const years = getAvailableYears();
+    yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y===state.viewYear?'selected':''}>${y}年</option>`).join('');
+
+    const goal = selectedGoal();
+    const archiveGrid = el('archiveGrid');
+    archiveGrid.innerHTML = Array.from({length:12}, (_,month) => {
+      const stats = getMonthStats(goal, state.viewYear, month);
+      const future = isMonthInFuture(state.viewYear, month);
+      const closed = isMonthClosed(state.viewYear, month);
+      const active = state.viewMonth === month;
+      const status = future ? '予定前' : closed ? '終了月' : '今月';
+      const className = `archive-btn ${active ? 'active' : ''} ${closed ? 'closed' : ''} ${future ? 'future' : ''}`;
+      return `<button class="${className}" data-archive-month="${month}" ${future ? 'disabled' : ''}><div class="m">${status}</div><div class="v">${MONTH_NAMES[month]}</div><div class="s">達成率 ${stats.rate}% / 実行 ${stats.doneTotal}件</div></button>`;
+    }).join('');
+
+    const yearStats = getYearStats(goal, state.viewYear);
+    el('yearSummaryList').innerHTML = yearStats.months.map(stats => {
+      const width = Math.max(2, stats.rate);
+      return `<div class="year-summary-row"><div>${stats.month+1}月</div><div class="year-summary-track"><div class="year-summary-fill" style="width:${width}%"></div></div><div style="text-align:right;font-size:12px;color:#475569;">${stats.rate}%</div></div>`;
+    }).join('');
+  }
+
   function renderGoalSummary(){
-    const goal = selectedGoal(), actions = currentActions(goal);
-    if(!goal){
-      el('goalSummaryArea').innerHTML = `<div class="empty">目標を選択してください。</div>`;
-      return;
-    }
+    const goal = selectedGoal(), actions = currentActions(goal), monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
+    if(!goal){ el('goalSummaryArea').innerHTML = `<div class="empty">目標を選択してください。</div>`; return; }
     el('goalSummaryArea').innerHTML = `
       <div class="goal-main-head">
         <div>
@@ -593,65 +626,50 @@
       <div style="background:#f8fafc;border-radius:18px;padding:14px;font-size:14px;line-height:1.7;color:#475569;margin-bottom:14px;">${esc(goal.purpose || '目的未設定')}</div>
       <div class="mini-grid">
         <div class="mini-box"><div class="k">登録タスク数</div><div class="v">${actions.length}</div></div>
-        <div class="mini-box"><div class="k">残り枠</div><div class="v">${Math.max(0, ACTION_MAX - actions.length)}</div></div>
+        <div class="mini-box"><div class="k">表示月の実行数</div><div class="v">${monthStats.doneTotal}</div></div>
         <div class="mini-box"><div class="k">最長継続</div><div class="v">${actions.length ? Math.max(...actions.map(a => calcActionStreak(a.id, goal))) : 0}日</div></div>
       </div>
       <div class="goal-meta-grid">
         <div class="goal-meta-box"><div class="k">価値観</div><div class="v">${esc(goal.values || '未設定')}</div></div>
         <div class="goal-meta-box"><div class="k">役割</div><div class="v">${esc(goal.roles || '未設定')}</div></div>
         <div class="goal-meta-box"><div class="k">期限</div><div class="v">${esc(goal.targetDate || '未設定')}</div></div>
-      </div>
-    `;
+      </div>`;
     el('editGoalBtn').addEventListener('click', () => openGoalModal(goal.id));
     el('deleteGoalBtn').addEventListener('click', () => {
-      const ok = confirm(`「${goal.title}」を削除しますか？`);
-      if(!ok) return;
-      state.goals = state.goals.filter(g => g.id !== goal.id);
-      state.selectedGoalId = state.goals[0] ? state.goals[0].id : null;
-      saveData('production-rebuild-delete-goal');
-      resetActionForm();
-      render();
-      setStatus('目標を削除しました。', 'warn');
+      const ok = confirm(`「${goal.title}」を削除しますか？`); if(!ok) return;
+      state.goals = state.goals.filter(g => g.id !== goal.id); state.selectedGoalId = state.goals[0] ? state.goals[0].id : null;
+      saveData('production-rebuild-delete-goal'); resetActionForm(); render(); setStatus('目標を削除しました。', 'warn');
     });
+  }
+
+  function renderGoals(){
+    const list = el('goalList'); const visibleGoals = state.goals || [];
+    list.innerHTML = visibleGoals.length ? visibleGoals.map(goal => {
+      const active = goal.id === state.selectedGoalId, left = daysLeft(goal.targetDate), actions = goal.actions || []; const yearStats = getYearStats(goal, state.viewYear);
+      return `<button class="goal-card ${active ? 'active' : ''}" data-goal-id="${goal.id}"><div class="goal-head"><div><div class="goal-item-title">${esc(goal.title)}</div><div class="goal-item-category">${esc(goal.category || '未設定')}</div></div><div style="color:#94a3b8;font-size:18px;">›</div></div><div class="goal-purpose">${esc(goal.purpose || '目的未設定')}</div><div class="chips"><span class="chip orange">タスク ${actions.length}件</span><span class="chip success">年達成率 ${yearStats.rate}%</span>${goal.targetDate ? `<span class="chip">期限 ${left !== null ? (left >= 0 ? `あと${left}日` : `${Math.abs(left)}日超過`) : '-'}</span>` : ''}</div></button>`;
+    }).join('') : `<div class="empty">まだ目標がありません。まずは1つ登録して始めましょう。</div>`;
+    list.querySelectorAll('[data-goal-id]').forEach(btn => btn.addEventListener('click', () => {
+      state.selectedGoalId = btn.dataset.goalId; saveData('production-rebuild-select-goal'); resetActionForm(); render();
+    }));
   }
 
   function renderActionButtons(){
     const goal = selectedGoal(), actions = getScheduledActionsForDate(TODAY_STR, goal), wrap = el('actionGrid');
-    if(!goal || !actions.length){
-      wrap.innerHTML = `<div class="empty" style="grid-column:1/-1;">今日対象のタスクはありません。繰り返し設定や開始日を見直してください。</div>`;
-      return;
-    }
+    if(!goal || !actions.length){ wrap.innerHTML = `<div class="empty" style="grid-column:1/-1;">今日対象のタスクはありません。繰り返し設定や開始日を見直してください。</div>`; return; }
     wrap.innerHTML = actions.map(action => {
       const done = isActionDone(TODAY_STR, action.id, goal), streak = calcActionStreak(action.id, goal);
-      return `
-        <button class="action-card ${done ? 'done' : ''}" data-action-id="${action.id}">
-          <div class="action-top">
-            <div>
-              <div class="action-name">${esc(action.title)}</div>
-              <div style="font-size:12px;opacity:.8;margin-top:4px;">${esc(action.category)} / 優先度 ${esc(action.priority || '中')}</div>
-            </div>
-            <div style="font-size:18px;">${done ? '●' : '○'}</div>
-          </div>
-          <div class="action-detail">${esc(action.detail || '具体内容未設定')}</div>
-          <div class="action-bottom"><span class="tag ${done ? '' : 'off'}">今日 ${done ? '達成' : '未達'}</span><span>${esc(getRepeatLabel(action))} / 連続 ${streak}回</span></div>
-        </button>
-      `;
+      return `<button class="action-card ${done ? 'done' : ''}" data-action-id="${action.id}"><div class="action-top"><div><div class="action-name">${esc(action.title)}</div><div style="font-size:12px;opacity:.8;margin-top:4px;">${esc(action.category)} / 優先度 ${esc(action.priority || '中')}</div></div><div style="font-size:18px;">${done ? '●' : '○'}</div></div><div class="action-detail">${esc(action.detail || '具体内容未設定')}</div><div class="action-bottom"><span class="tag ${done ? '' : 'off'}">今日 ${done ? '達成' : '未達'}</span><span>${esc(getRepeatLabel(action))} / 連続 ${streak}回</span></div></button>`;
     }).join('');
     wrap.querySelectorAll('[data-action-id]').forEach(btn => btn.addEventListener('click', () => {
       const goal = selectedGoal(), actionId = btn.dataset.actionId, logs = goal.actionLogs || (goal.actionLogs = {}), current = logs[TODAY_STR] || [];
       logs[TODAY_STR] = current.includes(actionId) ? current.filter(id => id !== actionId) : [...current, actionId];
-      saveData('production-rebuild-toggle-action');
-      render();
+      saveData('production-rebuild-toggle-action'); render();
     }));
   }
 
   function renderActionSettings(){
-    const goal = selectedGoal();
-    const list = el('actionSettingList');
-    if(!goal || !(goal.actions || []).length){
-      list.innerHTML = `<div class="empty">タスクがまだありません。まずは1件追加してください。</div>`;
-      return;
-    }
+    const goal = selectedGoal(); const list = el('actionSettingList');
+    if(!goal || !(goal.actions || []).length){ list.innerHTML = `<div class="empty">タスクがまだありません。まずは1件追加してください。</div>`; return; }
     list.innerHTML = goal.actions.map(action => `
       <div class="task-item">
         <div class="task-left">
@@ -661,7 +679,7 @@
             <span class="chip">${esc(action.category)}</span>
             <span class="chip ${action.priority==='高'?'priority-high':action.priority==='低'?'priority-low':'priority-medium'}">優先度 ${esc(action.priority || '中')}</span>
             <span class="chip">${esc(getRepeatLabel(action))}</span>
-            <span class="chip orange">今月 ${countActionThisMonth(action.id, goal)}回</span>
+            <span class="chip orange">表示月 ${countActionThisMonth(action.id, goal, state.viewYear, state.viewMonth)}回</span>
             ${action.paused ? '<span class="chip">一時停止中</span>' : ''}
           </div>
           <div class="task-detail">${esc(getScheduleSummary(action))}</div>
@@ -670,130 +688,71 @@
           <button type="button" class="btn btn-outline" data-action-cmd="edit" data-action-id="${action.id}">編集</button>
           <button type="button" class="btn btn-danger" data-action-cmd="delete" data-action-id="${action.id}">削除</button>
         </div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
   function renderGraphs(){
-    const goal = selectedGoal(), actions = currentActions(goal), bars = el('monthlyCategoryBars'), summary = el('actionSummaryList'), legend = el('categoryLegend'), days = getDaysInMonth(CURRENT_YEAR, CURRENT_MONTH);
+    const goal = selectedGoal(), actions = currentActions(goal), bars = el('monthlyCategoryBars'), summary = el('actionSummaryList'), legend = el('categoryLegend');
+    const year = state.viewYear, month = state.viewMonth, days = getDaysInMonth(year, month);
+    el('monthlyAnalysisTitle').textContent = `${getMonthTitle(year, month)} の分析`;
+    el('monthlyAnalysisSub').textContent = isMonthClosed(year, month) ? '終了した月をアーカイブとして閲覧中です。' : '進行中の月を日次達成率で確認できます。';
     legend.innerHTML = TASK_CATEGORIES.map(category => `<span class="legend-item"><span class="legend-dot" style="background:${getCategoryColor(category)}"></span>${category}</span>`).join('') + `<span class="legend-item"><span class="legend-dot" style="background:#e2e8f0"></span>未達 / 未設定</span>`;
+    bars.style.gridTemplateColumns = `repeat(${days}, minmax(22px,1fr))`;
     bars.innerHTML = Array.from({length:days}, (_,i) => i+1).map(day => {
-      const ds = getDateStr(CURRENT_YEAR, CURRENT_MONTH, day);
-      const scheduled = getScheduledActionsForDate(ds, goal);
-      const total = scheduled.length;
-      const doneIds = new Set(getDoneActions(ds, goal));
-      const doneTotal = total ? scheduled.filter(action => doneIds.has(action.id)).length : 0;
-      const rate = total ? Math.round((doneTotal / total) * 100) : 0;
+      const ds = getDateStr(year, month, day); const scheduled = getScheduledActionsForDate(ds, goal); const total = scheduled.length; const doneIds = new Set(getDoneActions(ds, goal)); const doneTotal = total ? scheduled.filter(action => doneIds.has(action.id)).length : 0; const rate = total ? Math.round((doneTotal / total) * 100) : 0;
       const segments = TASK_CATEGORIES.map(category => {
-        const catDone = total ? scheduled.filter(action => action.category === category && doneIds.has(action.id)).length : 0;
-        const pct = total ? (catDone / total) * 100 : 0;
+        const catDone = total ? scheduled.filter(action => action.category === category && doneIds.has(action.id)).length : 0; const pct = total ? (catDone / total) * 100 : 0;
         return pct > 0 ? `<div class="bar-segment" style="height:${pct}%;background:${getCategoryColor(category)}"></div>` : '';
       }).join('');
       const barHeight = rate > 0 ? `max(${rate}%, 14px)` : '6px';
       return `<div class="bar-col" title="${ds} / 達成率 ${rate}% / 実施 ${doneTotal} / 対象 ${total}"><div class="bar-value">${rate}%</div><div class="bar" style="height:${barHeight};opacity:${rate===0?.45:1};">${segments}</div><div class="bar-label">${day}</div></div>`;
     }).join('');
 
-    if(!goal || !actions.length){
-      summary.innerHTML = `<div class="empty">タスクがないため、集計グラフを表示できません。</div>`;
-      return;
-    }
-    const grouped = TASK_CATEGORIES.map(category => ({
-      category,
-      items: actions.filter(action => action.category === category).sort((a,b) => {
-        const diff = countActionThisMonth(b.id, goal) - countActionThisMonth(a.id, goal);
-        return diff !== 0 ? diff : a.title.localeCompare(b.title, 'ja');
-      })
-    })).filter(group => group.items.length);
-    const maxCount = Math.max(1, ...actions.map(a => countActionThisMonth(a.id, goal)));
+    if(!goal || !actions.length){ summary.innerHTML = `<div class="empty">タスクがないため、集計グラフを表示できません。</div>`; return; }
+    const grouped = TASK_CATEGORIES.map(category => ({ category, items: actions.filter(action => action.category === category).sort((a,b) => { const diff = countActionThisMonth(b.id, goal, year, month) - countActionThisMonth(a.id, goal, year, month); return diff !== 0 ? diff : a.title.localeCompare(b.title, 'ja'); }) })).filter(group => group.items.length);
+    const maxCount = Math.max(1, ...actions.map(a => countActionThisMonth(a.id, goal, year, month)));
     summary.innerHTML = grouped.map(group => {
-      const rows = group.items.map(action => {
-        const count = countActionThisMonth(action.id, goal), width = Math.round((count / maxCount) * 100);
-        return `<div class="summary-row"><div class="summary-name"><span class="legend-dot" style="background:${getCategoryColor(group.category)}"></span>${esc(action.title)}</div><div class="summary-track"><div class="summary-fill" style="width:${width}%;background:${getCategoryColor(group.category)}"></div></div><div class="summary-count">${count}回</div></div>`;
-      }).join('');
+      const rows = group.items.map(action => { const count = countActionThisMonth(action.id, goal, year, month), width = Math.round((count / maxCount) * 100); return `<div class="summary-row"><div class="summary-name"><span class="legend-dot" style="background:${getCategoryColor(group.category)}"></span>${esc(action.title)}</div><div class="summary-track"><div class="summary-fill" style="width:${width}%;background:${getCategoryColor(group.category)}"></div></div><div class="summary-count">${count}回</div></div>`; }).join('');
       return `<div class="summary-group-title">${group.category}</div>${rows}`;
     }).join('');
   }
 
-  function renderGoals(){
-    const list = el('goalList');
-    const visibleGoals = state.goals || [];
-    list.innerHTML = visibleGoals.length ? visibleGoals.map(goal => {
-      const active = goal.id === state.selectedGoalId, left = daysLeft(goal.targetDate), actions = goal.actions || [];
-      return `
-        <button class="goal-card ${active ? 'active' : ''}" data-goal-id="${goal.id}">
-          <div class="goal-head"><div><div class="goal-item-title">${esc(goal.title)}</div><div class="goal-item-category">${esc(goal.category || '未設定')}</div></div><div style="color:#94a3b8;font-size:18px;">›</div></div>
-          <div class="goal-purpose">${esc(goal.purpose || '目的未設定')}</div>
-          <div class="chips"><span class="chip orange">ボタン ${actions.length}件</span>${goal.targetDate ? `<span class="chip">期限 ${left !== null ? (left >= 0 ? `あと${left}日` : `${Math.abs(left)}日超過`) : '-'}</span>` : ''}</div>
-        </button>
-      `;
-    }).join('') : `<div class="empty">まだ目標がありません。まずは1つ登録して始めましょう。</div>`;
-    list.querySelectorAll('[data-goal-id]').forEach(btn => btn.addEventListener('click', () => {
-      state.selectedGoalId = btn.dataset.goalId;
-      saveData('production-rebuild-select-goal');
-      resetActionForm();
-      render();
-    }));
+  function renderHints(){
+    const goal = selectedGoal();
+    const monthStats = getMonthStats(goal, state.viewYear, state.viewMonth);
+    const yearStats = getYearStats(goal, state.viewYear);
+    const actions = currentActions(goal);
+    const lowExecution = [...actions].sort((a,b) => countActionThisMonth(a.id, goal, state.viewYear, state.viewMonth) - countActionThisMonth(b.id, goal, state.viewYear, state.viewMonth)).slice(0,2).filter(Boolean);
+    const hints = [
+      { title:'終了月はアーカイブとして固定閲覧', body:`${isMonthClosed(state.viewYear, state.viewMonth) ? 'この月は終了済みです。' : '今月は進行中です。'} 月が終わったらボタン化された履歴から即振り返れます。` },
+      { title:'月次CSVを定例資料のたたき台に', body:`表示月の実行ログをCSV出力できるので、月次レポートや週次報告への転記が楽になります。表示月の達成率は ${monthStats.rate}% です。` },
+      { title:'弱いタスクを先に見直す', body: lowExecution.length ? `表示月で実行回数が少ないのは ${lowExecution.map(a => `${a.title}（${countActionThisMonth(a.id, goal, state.viewYear, state.viewMonth)}回）`).join(' / ')} です。開始日・繰り返し・優先度の見直し候補です。` : 'まだ十分なログがないため、1か月使った後に実行回数の少ないタスクを見直すと効果的です。' },
+      { title:'年間で崩れた月を見つける', body:`${state.viewYear}年の年間達成率は ${yearStats.rate}%。最も良い月は ${yearStats.bestMonth ? `${yearStats.bestMonth.month+1}月（${yearStats.bestMonth.rate}%）` : '未判定'} です。` }
+    ];
+    el('hintList').innerHTML = hints.map(item => `<div class="hint-item"><strong>${esc(item.title)}</strong><div style="font-size:13px;color:#475569;line-height:1.7;">${esc(item.body)}</div></div>`).join('');
   }
 
-  function syncRepeatFieldVisibility(){
-    const isWeekly = el('actionRepeatTypeInput').value === 'weekly';
-    el('actionWeekdaysField').style.display = isWeekly ? '' : 'none';
+  function refreshLocalMiniStatus(){
+    const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
+    el('localMiniStatus').innerHTML = `goals件数: ${goalsCount}<br>selectedGoalId: ${esc(state.selectedGoalId || '—')}<br>表示月: ${esc(getMonthTitle(state.viewYear, state.viewMonth))}<br>更新者: ${esc(state._updatedBy || '—')}`;
   }
 
-  function getSelectedRepeatDays(){
-    return Array.from(el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]:checked')).map(input => Number(input.value)).sort((a,b) => a-b);
-  }
-
-  function setSelectedRepeatDays(days=[]){
-    const values = new Set((days || []).map(v => Number(v)));
-    el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = values.has(Number(input.value)));
-  }
+  function syncRepeatFieldVisibility(){ el('actionWeekdaysField').style.display = el('actionRepeatTypeInput').value === 'weekly' ? '' : 'none'; }
+  function getSelectedRepeatDays(){ return Array.from(el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]:checked')).map(input => Number(input.value)).sort((a,b) => a-b); }
+  function setSelectedRepeatDays(days=[]){ const values = new Set((days || []).map(v => Number(v))); el('actionWeekdaysField').querySelectorAll('input[type="checkbox"]').forEach(input => input.checked = values.has(Number(input.value))); }
 
   function resetActionForm(){
-    editingActionId = null;
-    el('actionTitleInput').value = '';
-    el('actionDetailInput').value = '';
-    el('actionCategoryInput').value = '知性';
-    el('actionPriorityInput').value = '中';
-    el('actionRepeatTypeInput').value = 'daily';
-    setSelectedRepeatDays([]);
-    el('actionStartDateInput').value = TODAY_STR;
-    el('actionEndDateInput').value = '';
-    el('actionPausedInput').checked = false;
-    el('saveActionBtn').textContent = '追加';
-    syncRepeatFieldVisibility();
+    editingActionId = null; el('actionTitleInput').value = ''; el('actionDetailInput').value = ''; el('actionCategoryInput').value = '知性'; el('actionPriorityInput').value = '中'; el('actionRepeatTypeInput').value = 'daily'; setSelectedRepeatDays([]); el('actionStartDateInput').value = TODAY_STR; el('actionEndDateInput').value = ''; el('actionPausedInput').checked = false; el('saveActionBtn').textContent = '追加'; syncRepeatFieldVisibility();
   }
 
   function startEditAction(id){
-    const action = (selectedGoal().actions || []).find(a => a.id === id);
-    if(!action) return;
-    editingActionId = id;
-    el('actionTitleInput').value = action.title || '';
-    el('actionDetailInput').value = action.detail || '';
-    el('actionCategoryInput').value = action.category || '知性';
-    el('actionPriorityInput').value = action.priority || '中';
-    el('actionRepeatTypeInput').value = action.repeatType || 'daily';
-    setSelectedRepeatDays(action.repeatDays || []);
-    el('actionStartDateInput').value = action.startDate || TODAY_STR;
-    el('actionEndDateInput').value = action.endDate || '';
-    el('actionPausedInput').checked = !!action.paused;
-    el('saveActionBtn').textContent = '更新';
-    syncRepeatFieldVisibility();
-    el('actionTitleInput').focus();
-    el('actionSettingToggle').open = true;
+    const action = (selectedGoal().actions || []).find(a => a.id === id); if(!action) return;
+    editingActionId = id; el('actionTitleInput').value = action.title || ''; el('actionDetailInput').value = action.detail || ''; el('actionCategoryInput').value = action.category || '知性'; el('actionPriorityInput').value = action.priority || '中'; el('actionRepeatTypeInput').value = action.repeatType || 'daily'; setSelectedRepeatDays(action.repeatDays || []); el('actionStartDateInput').value = action.startDate || TODAY_STR; el('actionEndDateInput').value = action.endDate || ''; el('actionPausedInput').checked = !!action.paused; el('saveActionBtn').textContent = '更新'; syncRepeatFieldVisibility(); el('actionTitleInput').focus(); el('actionSettingToggle').open = true;
   }
 
   function saveActionFromForm(){
     const goal = selectedGoal();
-    const title = el('actionTitleInput').value.trim();
-    const detail = el('actionDetailInput').value.trim();
-    const category = el('actionCategoryInput').value;
-    const priority = el('actionPriorityInput').value;
-    const repeatType = el('actionRepeatTypeInput').value;
-    const repeatDays = getSelectedRepeatDays();
-    const startDate = el('actionStartDateInput').value || TODAY_STR;
-    const endDate = el('actionEndDateInput').value;
-    const paused = el('actionPausedInput').checked;
+    const title = el('actionTitleInput').value.trim(); const detail = el('actionDetailInput').value.trim(); const category = el('actionCategoryInput').value; const priority = el('actionPriorityInput').value; const repeatType = el('actionRepeatTypeInput').value; const repeatDays = getSelectedRepeatDays(); const startDate = el('actionStartDateInput').value || TODAY_STR; const endDate = el('actionEndDateInput').value; const paused = el('actionPausedInput').checked;
     if(!title) return alert('タスク名を入力してください。');
     if(!detail) return alert('具体的に何をするかを入力してください。');
     if(repeatType === 'weekly' && !repeatDays.length) return alert('毎週を選んだ場合は曜日を1つ以上選択してください。');
@@ -801,251 +760,103 @@
     goal.actions = goal.actions || [];
     if(!editingActionId && goal.actions.length >= ACTION_MAX) return alert(`タスクは最大${ACTION_MAX}件までです。`);
     const payload = normalizeAction({ id: editingActionId || uid(), title, detail, category, priority, repeatType, repeatDays, startDate, endDate, paused });
-    if(editingActionId){
-      const target = goal.actions.find(a => a.id === editingActionId);
-      if(target) Object.assign(target, payload);
-    } else {
-      goal.actions.unshift(payload);
-    }
-    saveData('production-rebuild-save-action');
-    resetActionForm();
-    render();
-    setStatus('タスク設定を保存しました。', 'ok');
+    if(editingActionId){ const target = goal.actions.find(a => a.id === editingActionId); if(target) Object.assign(target, payload); }
+    else { goal.actions.unshift(payload); }
+    saveData('production-rebuild-save-action'); resetActionForm(); render(); setStatus('タスク設定を保存しました。', 'ok');
   }
 
   function deleteAction(id){
-    const goal = selectedGoal();
-    const target = (goal.actions || []).find(a => a.id === id);
-    const ok = confirm(`「${target?.title || 'このボタン'}」を削除しますか？`);
-    if(!ok) return;
-    goal.actions = (goal.actions || []).filter(a => a.id !== id);
-    Object.keys(goal.actionLogs || {}).forEach(ds => goal.actionLogs[ds] = (goal.actionLogs[ds] || []).filter(v => v !== id));
-    if(editingActionId === id) resetActionForm();
-    saveData('production-rebuild-delete-action');
-    render();
-    setStatus('タスクを削除しました。', 'warn');
+    const goal = selectedGoal(); const target = (goal.actions || []).find(a => a.id === id); const ok = confirm(`「${target?.title || 'このボタン'}」を削除しますか？`); if(!ok) return;
+    goal.actions = (goal.actions || []).filter(a => a.id !== id); Object.keys(goal.actionLogs || {}).forEach(ds => goal.actionLogs[ds] = (goal.actionLogs[ds] || []).filter(v => v !== id)); if(editingActionId === id) resetActionForm(); saveData('production-rebuild-delete-action'); render(); setStatus('タスクを削除しました。', 'warn');
   }
 
   function openGoalModal(goalId = null){
     editingGoalId = goalId;
-    if(goalId){
-      const goal = state.goals.find(g => g.id === goalId);
-      el('modalTitle').textContent = '目標を編集';
-      el('goalTitleInput').value = goal.title || '';
-      el('goalPurposeInput').value = goal.purpose || '';
-      el('goalValuesInput').value = goal.values || '';
-      el('goalRolesInput').value = goal.roles || '';
-      el('goalCategoryInput').value = goal.category || '仕事';
-      el('goalDateInput').value = goal.targetDate || '';
-    } else {
-      el('modalTitle').textContent = '新しい目標を追加';
-      el('goalTitleInput').value = '';
-      el('goalPurposeInput').value = '';
-      el('goalValuesInput').value = '';
-      el('goalRolesInput').value = '';
-      el('goalCategoryInput').value = '仕事';
-      el('goalDateInput').value = '';
-    }
+    if(goalId){ const goal = state.goals.find(g => g.id === goalId); el('modalTitle').textContent = '目標を編集'; el('goalTitleInput').value = goal.title || ''; el('goalPurposeInput').value = goal.purpose || ''; el('goalValuesInput').value = goal.values || ''; el('goalRolesInput').value = goal.roles || ''; el('goalCategoryInput').value = goal.category || '仕事'; el('goalDateInput').value = goal.targetDate || ''; }
+    else { el('modalTitle').textContent = '新しい目標を追加'; el('goalTitleInput').value = ''; el('goalPurposeInput').value = ''; el('goalValuesInput').value = ''; el('goalRolesInput').value = ''; el('goalCategoryInput').value = '仕事'; el('goalDateInput').value = ''; }
     el('goalModal').classList.add('show');
   }
-
-  function closeGoalModal(){
-    editingGoalId = null;
-    el('goalModal').classList.remove('show');
-  }
-
+  function closeGoalModal(){ editingGoalId = null; el('goalModal').classList.remove('show'); }
   function saveGoalFromModal(){
-    const title = el('goalTitleInput').value.trim();
-    const purpose = el('goalPurposeInput').value.trim();
-    const values = el('goalValuesInput').value.trim();
-    const roles = el('goalRolesInput').value.trim();
-    const category = el('goalCategoryInput').value;
-    const targetDate = el('goalDateInput').value;
-    if(!title) return alert('目標名を入力してください。');
-    if(editingGoalId){
-      const goal = state.goals.find(g => g.id === editingGoalId);
-      Object.assign(goal, {title, purpose, values, roles, category, targetDate});
-    } else {
-      const newGoal = {id:uid(), title, purpose, values, roles, category, targetDate, actions:[], actionLogs:{}};
-      state.goals.unshift(newGoal);
-      state.selectedGoalId = newGoal.id;
+    const title = el('goalTitleInput').value.trim(); const purpose = el('goalPurposeInput').value.trim(); const values = el('goalValuesInput').value.trim(); const roles = el('goalRolesInput').value.trim(); const category = el('goalCategoryInput').value; const targetDate = el('goalDateInput').value; if(!title) return alert('目標名を入力してください。');
+    if(editingGoalId){ const goal = state.goals.find(g => g.id === editingGoalId); Object.assign(goal, {title, purpose, values, roles, category, targetDate}); }
+    else { const newGoal = {id:uid(), title, purpose, values, roles, category, targetDate, actions:[], actionLogs:{}}; state.goals.unshift(newGoal); state.selectedGoalId = newGoal.id; }
+    saveData('production-rebuild-save-goal'); closeGoalModal(); render(); setStatus('目標を保存しました。', 'ok');
+  }
+
+  function downloadText(filename, text, mime='text/plain'){ const blob = new Blob([text], {type:mime}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+  function exportJson(){ downloadText(`SAFE-${APP_KEY}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`, JSON.stringify(state, null, 2), 'application/json'); setStatus('JSONエクスポートが完了しました。', 'ok'); }
+  async function importJson(file){ const text = await file.text(); const data = JSON.parse(text); if(!data || !Array.isArray(data.goals)) throw new Error('goals を含むJSONではありません'); state = normalizeState(data); if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id; saveData('production-rebuild-import-json', { scheduleSync:false }); render(); setStatus('JSONインポートが完了しました。', 'ok'); }
+
+  function exportMonthCsv(){
+    const goal = selectedGoal();
+    if(!goal) return setStatus('目標がないためCSVを出力できません。', 'warn');
+    const year = state.viewYear, month = state.viewMonth, days = getDaysInMonth(year, month);
+    const rows = [['date','goal','scheduled_count','done_count','rate','done_titles']];
+    for(let day=1; day<=days; day++){
+      const ds = getDateStr(year, month, day); const scheduled = getScheduledActionsForDate(ds, goal); const doneIds = new Set(getDoneActions(ds, goal)); const doneActions = scheduled.filter(action => doneIds.has(action.id)); const rate = scheduled.length ? Math.round((doneActions.length/scheduled.length)*100) : 0;
+      rows.push([ds, goal.title, scheduled.length, doneActions.length, rate, doneActions.map(v => v.title).join(' / ')]);
     }
-    saveData('production-rebuild-save-goal');
-    closeGoalModal();
-    render();
-    setStatus('目標を保存しました。', 'ok');
+    const csv = rows.map(row => row.map(cell => `"${String(cell ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
+    downloadText(`${year}-${pad(month+1)}_${goal.title}_月次ログ.csv`, csv, 'text/csv;charset=utf-8;');
+    setStatus(`${getMonthTitle(year, month)} のCSVを出力しました。`, 'ok');
   }
 
-  function downloadJson(filename, text){
-    const blob = new Blob([text], {type:'application/json'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(a.href);
+  function exportYearJson(){
+    const goal = selectedGoal();
+    if(!goal) return setStatus('目標がないためJSONを出力できません。', 'warn');
+    const year = state.viewYear;
+    const filteredLogs = Object.fromEntries(Object.entries(goal.actionLogs || {}).filter(([ds]) => parseDateOnly(ds)?.getFullYear() === year));
+    const exportBody = { appVersion: APP_VERSION, exportedAt: new Date().toISOString(), year, goal: { ...goal, actionLogs: filteredLogs }, yearStats: getYearStats(goal, year) };
+    downloadText(`${year}_${goal.title}_年間アーカイブ.json`, JSON.stringify(exportBody, null, 2), 'application/json');
+    setStatus(`${year}年の年間JSONを出力しました。`, 'ok');
   }
 
-  function exportJson(){
-    downloadJson(`SAFE-${APP_KEY}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`, JSON.stringify(state, null, 2));
-    setStatus('JSONエクスポートが完了しました。', 'ok');
-  }
+  function loadConfig(){ try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); } catch { return {}; } }
+  function saveConfig(){ const cfg = { projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''), anonKey:(el('anonKeyInput').value || '').trim() }; if(!cfg.projectUrl) throw new Error('Project URL を入力してください'); if(!cfg.anonKey) throw new Error('Anon Key を入力してください'); localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); setStatus('Supabase 設定を保存しました。', 'ok'); }
+  function getConfig(){ const cfg = { projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''), anonKey:(el('anonKeyInput').value || '').trim() }; if(!cfg.projectUrl) throw new Error('Project URL を入力してください'); if(!cfg.anonKey) throw new Error('Anon Key を入力してください'); return cfg; }
+  async function supabaseRequest(method, path, body){ const cfg = getConfig(); const res = await fetch(cfg.projectUrl + path, { method, headers:{ 'apikey':cfg.anonKey, 'Authorization':'Bearer ' + cfg.anonKey, 'Content-Type':'application/json', 'Prefer':'resolution=merge-duplicates,return=representation' }, body: body ? JSON.stringify(body) : undefined }); const text = await res.text(); let json; try { json = text ? JSON.parse(text) : null; } catch { json = text; } if(!res.ok) throw new Error('HTTP ' + res.status + ': ' + (typeof json === 'string' ? json : JSON.stringify(json))); return json; }
+  async function testConnection(){ setStatus('接続テスト中...', 'info'); await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`); setStatus('接続テスト成功', 'ok'); }
+  async function fetchCloudState(){ const rows = await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key,payload,updated_at,updated_by,app_version&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`); const row = Array.isArray(rows) ? rows[0] : null; if(!row) return null; return { payload: row.payload || {}, updatedAt: row.updated_at || '', updatedBy: row.updated_by || '', appVersion: row.app_version || '' }; }
+  function updateCloudSummary(info){ if(!info){ el('cloudSummary').innerHTML = '<div>クラウドgoals件数</div><div>未取得</div><div>クラウド最終更新</div><div>未取得</div><div>クラウド更新者</div><div>未取得</div><div>クラウドapp_version</div><div>未取得</div>'; return; } const count = Array.isArray(info.payload?.goals) ? info.payload.goals.length : (info.goalsCount ?? '未取得'); el('cloudSummary').innerHTML = `<div>クラウドgoals件数</div><div>${count}</div><div>クラウド最終更新</div><div>${info.updatedAt || '未取得'}</div><div>クラウド更新者</div><div>${esc(info.updatedBy || '未取得')}</div><div>クラウドapp_version</div><div>${esc(info.appVersion || '未取得')}</div>`; }
 
-  async function importJson(file){
-    const text = await file.text();
-    const data = JSON.parse(text);
-    if(!data || !Array.isArray(data.goals)) throw new Error('goals を含むJSONではありません');
-    state = normalizeState(data);
-    if(!state.selectedGoalId && state.goals[0]) state.selectedGoalId = state.goals[0].id;
-    saveData('production-rebuild-import-json', { scheduleSync:false });
-    render();
-    setStatus('JSONインポートが完了しました。', 'ok');
-  }
-
-  function loadConfig(){
-    try { return JSON.parse(localStorage.getItem(CONFIG_KEY) || '{}'); }
-    catch { return {}; }
-  }
-  function saveConfig(){
-    const cfg = {
-      projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''),
-      anonKey:(el('anonKeyInput').value || '').trim()
-    };
-    if(!cfg.projectUrl) throw new Error('Project URL を入力してください');
-    if(!cfg.anonKey) throw new Error('Anon Key を入力してください');
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
-    setStatus('Supabase 設定を保存しました。', 'ok');
-  }
-  function getConfig(){
-    const cfg = {
-      projectUrl:(el('projectUrlInput').value || '').trim().replace(/\/+$/,''),
-      anonKey:(el('anonKeyInput').value || '').trim()
-    };
-    if(!cfg.projectUrl) throw new Error('Project URL を入力してください');
-    if(!cfg.anonKey) throw new Error('Anon Key を入力してください');
-    return cfg;
-  }
-  async function supabaseRequest(method, path, body){
-    const cfg = getConfig();
-    const res = await fetch(cfg.projectUrl + path, {
-      method,
-      headers:{
-        'apikey':cfg.anonKey,
-        'Authorization':'Bearer ' + cfg.anonKey,
-        'Content-Type':'application/json',
-        'Prefer':'resolution=merge-duplicates,return=representation'
-      },
-      body: body ? JSON.stringify(body) : undefined
-    });
-    const text = await res.text();
-    let json;
-    try { json = text ? JSON.parse(text) : null; } catch { json = text; }
-    if(!res.ok) throw new Error('HTTP ' + res.status + ': ' + (typeof json === 'string' ? json : JSON.stringify(json)));
-    return json;
-  }
-  async function testConnection(){
-    setStatus('接続テスト中...', 'info');
-    await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`);
-    setStatus('接続テスト成功', 'ok');
-  }
-  async function fetchCloudState(){
-    const rows = await supabaseRequest('GET', `/rest/v1/${TABLE_NAME}?select=app_key,payload,updated_at,updated_by,app_version&app_key=eq.${encodeURIComponent(APP_KEY)}&limit=1`);
-    const row = Array.isArray(rows) ? rows[0] : null;
-    if(!row) return null;
-    return { payload: row.payload || {}, updatedAt: row.updated_at || '', updatedBy: row.updated_by || '', appVersion: row.app_version || '' };
-  }
-  function updateCloudSummary(info){
-    if(!info){
-      el('cloudSummary').innerHTML = '<div>クラウドgoals件数</div><div>未取得</div><div>クラウド最終更新</div><div>未取得</div><div>クラウド更新者</div><div>未取得</div><div>クラウドapp_version</div><div>未取得</div>';
-      return;
-    }
-    const count = Array.isArray(info.payload?.goals) ? info.payload.goals.length : (info.goalsCount ?? '未取得');
-    el('cloudSummary').innerHTML = `<div>クラウドgoals件数</div><div>${count}</div><div>クラウド最終更新</div><div>${info.updatedAt || '未取得'}</div><div>クラウド更新者</div><div>${esc(info.updatedBy || '未取得')}</div><div>クラウドapp_version</div><div>${esc(info.appVersion || '未取得')}</div>`;
-  }
-  async function syncToCloudInternal({interactive=true, skipConfirm=false, updatedBy='production-rebuild-v1-ui'} = {}){
+  async function syncToCloudInternal({interactive=true, skipConfirm=false, updatedBy='production-rebuild-v2-ui'} = {}){
     if(isSyncing) return false;
-
     const goalsCount = Array.isArray(state.goals) ? state.goals.length : 0;
-    if(interactive && !skipConfirm && goalsCount === 0){
-      const ok = confirm('警告: goals が 0 件です。空データをクラウドへ同期する可能性があります。\n本当に続行しますか？');
-      if(!ok) return false;
-    }
-    if(interactive && !skipConfirm){
-      const ok2 = confirm(`ローカルの内容をクラウドへ同期します。\n\n・goals件数: ${goalsCount}\n・selectedGoalId: ${state.selectedGoalId || '—'}\n\n続行しますか？`);
-      if(!ok2) return false;
-    }
-
-    state._updatedAt = new Date().toISOString();
-    state._updatedBy = updatedBy;
-    state._appVersion = APP_VERSION;
-    localStorage.setItem(APP_KEY, JSON.stringify(state));
-
+    if(interactive && !skipConfirm && goalsCount === 0){ const ok = confirm('警告: goals が 0 件です。空データをクラウドへ同期する可能性があります。\n本当に続行しますか？'); if(!ok) return false; }
+    if(interactive && !skipConfirm){ const ok2 = confirm(`ローカルの内容をクラウドへ同期します。\n\n・goals件数: ${goalsCount}\n・selectedGoalId: ${state.selectedGoalId || '—'}\n・表示月: ${getMonthTitle(state.viewYear, state.viewMonth)}\n\n続行しますか？`); if(!ok2) return false; }
+    state._updatedAt = new Date().toISOString(); state._updatedBy = updatedBy; state._appVersion = APP_VERSION; localStorage.setItem(APP_KEY, JSON.stringify(state));
     try {
-      isSyncing = true;
-      setSyncBadge('同期中...', 'syncing');
-      if(interactive) setStatus('クラウドへ同期中...', 'info');
-
-      const payload = structuredClone(state);
-      await supabaseRequest('POST', `/rest/v1/${TABLE_NAME}?on_conflict=app_key`, {
-        app_key: APP_KEY,
-        payload,
-        updated_at: payload._updatedAt,
-        updated_by: payload._updatedBy,
-        app_version: payload._appVersion
-      });
-      updateCloudSummary({payload, updatedAt: payload._updatedAt, updatedBy: payload._updatedBy, appVersion: payload._appVersion});
-      refreshLocalMiniStatus();
-      hasUnsyncedChanges = false;
-      setSyncBadge('同期済み ' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'}), 'synced');
-      if(interactive) setStatus('クラウド同期が完了しました。', 'ok');
-      return true;
+      isSyncing = true; setSyncBadge('同期中...', 'syncing'); if(interactive) setStatus('クラウドへ同期中...', 'info');
+      const payload = structuredCloneSafe(state);
+      await supabaseRequest('POST', `/rest/v1/${TABLE_NAME}?on_conflict=app_key`, { app_key: APP_KEY, payload, updated_at: payload._updatedAt, updated_by: payload._updatedBy, app_version: payload._appVersion });
+      updateCloudSummary({payload, updatedAt: payload._updatedAt, updatedBy: payload._updatedBy, appVersion: payload._appVersion}); refreshLocalMiniStatus(); hasUnsyncedChanges = false; setSyncBadge('同期済み ' + new Date().toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'}), 'synced'); if(interactive) setStatus('クラウド同期が完了しました。', 'ok'); return true;
     } catch(err) {
-      hasUnsyncedChanges = true;
-      setSyncBadge('同期失敗', 'error');
-      if(interactive) throw err;
-      console.error('auto sync failed', err);
-      return false;
-    } finally {
-      isSyncing = false;
-    }
+      hasUnsyncedChanges = true; setSyncBadge('同期失敗', 'error'); if(interactive) throw err; console.error('auto sync failed', err); return false;
+    } finally { isSyncing = false; }
   }
 
-  async function syncToCloud(){
-    return await syncToCloudInternal({interactive:true, skipConfirm:false, updatedBy:'production-rebuild-v1-ui-manual'});
-  }
-
+  async function syncToCloud(){ return await syncToCloudInternal({interactive:true, skipConfirm:false, updatedBy:'production-rebuild-v2-ui-manual'}); }
   async function loadFromCloud({interactive=true} = {}){
-    if(interactive){
-      const ok = confirm('クラウドの内容でローカルを上書きします。続行しますか？');
-      if(!ok) return false;
-      setStatus('クラウド読込中...', 'info');
-    }
-
+    if(interactive){ const ok = confirm('クラウドの内容でローカルを上書きします。続行しますか？'); if(!ok) return false; setStatus('クラウド読込中...', 'info'); }
     const cloud = await fetchCloudState();
-    if(!cloud){
-      updateCloudSummary(null);
-      if(interactive) setStatus('クラウドにデータが見つかりませんでした。', 'warn');
-      setSyncBadge('クラウドデータなし', 'idle');
-      return false;
-    }
+    if(!cloud){ updateCloudSummary(null); if(interactive) setStatus('クラウドにデータが見つかりませんでした。', 'warn'); setSyncBadge('クラウドデータなし', 'idle'); return false; }
+    const cloudGoals = Array.isArray(cloud.payload?.goals) ? cloud.payload.goals.length : 0; const localGoals = Array.isArray(state.goals) ? state.goals.length : 0;
+    if(interactive){ const ok2 = confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${cloud.updatedAt || '未取得'}\n\n続行しますか？`); if(!ok2) return false; }
+    state = normalizeState(cloud.payload || structuredCloneSafe(initialData)); if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id; localStorage.setItem(APP_KEY, JSON.stringify(state)); render(); updateCloudSummary(cloud); hasUnsyncedChanges = false; setSyncBadge('クラウド読込完了', 'synced'); if(interactive) setStatus('クラウドからローカルへ反映しました。', 'ok'); return true;
+  }
 
-    const cloudGoals = Array.isArray(cloud.payload?.goals) ? cloud.payload.goals.length : 0;
-    const localGoals = Array.isArray(state.goals) ? state.goals.length : 0;
-    if(interactive){
-      const ok2 = confirm(`クラウド内容を反映します。\n\nローカル: ${localGoals}\nクラウド: ${cloudGoals}\n最終更新: ${cloud.updatedAt || '未取得'}\n\n続行しますか？`);
-      if(!ok2) return false;
-    }
-
-    state = normalizeState(cloud.payload || structuredClone(initialData));
-    if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id;
-    localStorage.setItem(APP_KEY, JSON.stringify(state));
-    render();
-    updateCloudSummary(cloud);
-    hasUnsyncedChanges = false;
-    setSyncBadge('クラウド読込完了', 'synced');
-    if(interactive) setStatus('クラウドからローカルへ反映しました。', 'ok');
-    return true;
+  async function bootstrapLatestState(){
+    render(); updateCloudSummary(null); setSyncBadge('起動確認中...', 'syncing');
+    const hasConfig = !!((el('projectUrlInput')?.value || '').trim() && (el('anonKeyInput')?.value || '').trim());
+    if(!hasConfig){ setSyncBadge('ローカル運用中', 'offline'); setStatus('Supabase設定未入力のため、ローカル状態で起動しました。', 'warn'); return; }
+    try {
+      const cloud = await fetchCloudState(); updateCloudSummary(cloud);
+      if(!cloud?.payload){ setSyncBadge('クラウド未取得', 'idle'); setStatus('クラウドに保存済みデータが見つからないため、ローカル状態で起動しました。', 'ok'); return; }
+      const localTime = getIsoTime(state?._updatedAt); const cloudTime = getIsoTime(cloud.updatedAt || cloud.payload?._updatedAt);
+      if(cloudTime > localTime){ state = normalizeState(cloud.payload); if(!state.selectedGoalId && state.goals?.[0]) state.selectedGoalId = state.goals[0].id; localStorage.setItem(APP_KEY, JSON.stringify(state)); render(); setSyncBadge('クラウド最新を反映', 'synced'); setStatus('クラウドの方が新しかったため、自動で最新状態を反映しました。', 'ok'); }
+      else { setSyncBadge('ローカル最新で起動', 'synced'); setStatus('ローカル最新状態で起動しました。', 'ok'); }
+    } catch(err){ console.error(err); setSyncBadge('クラウド確認失敗', 'error'); setStatus('起動時のクラウド確認をスキップしました: ' + err.message, 'warn'); }
   }
 
   function bindEvents(){
@@ -1054,86 +865,36 @@
     el('cancelGoalModalBtn').addEventListener('click', closeGoalModal);
     el('saveGoalBtn').addEventListener('click', saveGoalFromModal);
     el('goalModal').addEventListener('click', (e) => { if(e.target.id === 'goalModal') closeGoalModal(); });
-
     el('saveActionBtn').addEventListener('click', (e) => { e.preventDefault(); saveActionFromForm(); });
     el('resetActionFormBtn').addEventListener('click', (e) => { e.preventDefault(); resetActionForm(); });
     el('actionRepeatTypeInput').addEventListener('change', syncRepeatFieldVisibility);
-    el('actionSettingList').addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-action-cmd]');
-      if(!btn) return;
-      e.preventDefault(); e.stopPropagation();
-      const cmd = btn.dataset.actionCmd, id = btn.dataset.actionId;
-      if(cmd === 'edit') startEditAction(id);
-      if(cmd === 'delete') deleteAction(id);
-    });
-
-    el('btnSaveLocal').addEventListener('click', async () => {
-        saveData('production-rebuild-local-save-manual', { scheduleSync:false });
-      render();
-      setSyncBadge('ローカル保存済み', 'idle');
-      setStatus('ローカル保存が完了しました。', 'ok');
-    });
-
-
-    window.addEventListener('beforeunload', () => {
-      try {
-            if(hasUnsyncedChanges && !isSyncing){
-          state._updatedAt = new Date().toISOString();
-          state._updatedBy = 'production-rebuild-beforeunload';
-          state._appVersion = APP_VERSION;
-          localStorage.setItem(APP_KEY, JSON.stringify(state));
-        }
-      } catch(_) {}
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if(document.visibilityState === 'hidden'){
-            if(hasUnsyncedChanges && !isSyncing){
-          syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-visibility-sync'});
-        }
-      }
-    });
+    el('actionSettingList').addEventListener('click', (e) => { const btn = e.target.closest('[data-action-cmd]'); if(!btn) return; e.preventDefault(); e.stopPropagation(); const cmd = btn.dataset.actionCmd, id = btn.dataset.actionId; if(cmd === 'edit') startEditAction(id); if(cmd === 'delete') deleteAction(id); });
+    el('btnSaveLocal').addEventListener('click', () => { saveData('production-rebuild-local-save-manual', { scheduleSync:false }); render(); setSyncBadge('ローカル保存済み', 'idle'); setStatus('ローカル保存が完了しました。', 'ok'); });
+    window.addEventListener('beforeunload', () => { try { if(hasUnsyncedChanges && !isSyncing){ state._updatedAt = new Date().toISOString(); state._updatedBy = 'production-rebuild-beforeunload'; state._appVersion = APP_VERSION; localStorage.setItem(APP_KEY, JSON.stringify(state)); } } catch(_) {} });
+    document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'hidden'){ if(hasUnsyncedChanges && !isSyncing){ syncToCloudInternal({interactive:false, skipConfirm:true, updatedBy:'production-rebuild-visibility-sync'}); } } });
     el('btnExportTop').addEventListener('click', exportJson);
-    el('fileImportTop').addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if(!file) return;
-      try { await importJson(file); } catch(err){ setStatus('JSONインポート失敗: ' + err.message, 'error'); } finally { e.target.value = ''; }
-    });
-
+    el('btnExportMonthCsvTop').addEventListener('click', exportMonthCsv);
+    el('btnExportYearJsonTop').addEventListener('click', exportYearJson);
+    el('btnExportMonthCsv').addEventListener('click', exportMonthCsv);
+    el('btnExportYearJson').addEventListener('click', exportYearJson);
+    el('fileImportTop').addEventListener('change', async (e) => { const file = e.target.files?.[0]; if(!file) return; try { await importJson(file); } catch(err){ setStatus('JSONインポート失敗: ' + err.message, 'error'); } finally { e.target.value = ''; } });
     el('btnSaveConfig').addEventListener('click', () => { try { saveConfig(); } catch(err){ setStatus(err.message, 'error'); } });
     el('btnTestConnection').addEventListener('click', async () => { try { await testConnection(); } catch(err){ setStatus('接続テスト失敗: ' + err.message, 'error'); } });
     el('btnSyncToCloud').addEventListener('click', async () => { try { await syncToCloud(); } catch(err){ setStatus('クラウド同期失敗: ' + err.message, 'error'); } });
     el('btnLoadFromCloud').addEventListener('click', async () => { try { await loadFromCloud(); } catch(err){ setStatus('クラウド読込失敗: ' + err.message, 'error'); } });
+    el('viewYearSelect').addEventListener('change', (e) => { const year = Number(e.target.value); if(isMonthInFuture(year, state.viewMonth)) changeViewMonth(year, CURRENT_MONTH); else changeViewMonth(year, state.viewMonth); });
+    el('archiveGrid').addEventListener('click', (e) => { const btn = e.target.closest('[data-archive-month]'); if(!btn) return; changeViewMonth(state.viewYear, Number(btn.dataset.archiveMonth)); });
+    el('prevMonthBtn').addEventListener('click', () => { let y = state.viewYear, m = state.viewMonth - 1; if(m < 0){ y -= 1; m = 11; } changeViewMonth(y, m); });
+    el('nextMonthBtn').addEventListener('click', () => { let y = state.viewYear, m = state.viewMonth + 1; if(m > 11){ y += 1; m = 0; } if(isMonthInFuture(y, m)) return; changeViewMonth(y, m); });
+    el('backToCurrentBtn').addEventListener('click', () => changeViewMonth(CURRENT_YEAR, CURRENT_MONTH));
   }
 
-  function initSafeToggle(){
-    const toggle = el('actionSettingToggle');
-    const list = el('actionSettingList');
-    if(!toggle || !list) return;
-    list.addEventListener('click', function(e){
-      const btn = e.target.closest('[data-action-cmd="edit"]');
-      if(btn) toggle.open = true;
-    });
-  }
+  function initSafeToggle(){ const toggle = el('actionSettingToggle'); const list = el('actionSettingList'); if(!toggle || !list) return; list.addEventListener('click', function(e){ const btn = e.target.closest('[data-action-cmd="edit"]'); if(btn) toggle.open = true; }); }
 
-  function render(){
-      renderStats();
-    renderGoalSummary();
-    renderActionSettings();
-    renderGraphs();
-    renderGoals();
-    renderActionButtons();
-    refreshLocalMiniStatus();
-  }
+  function render(){ renderStats(); renderViewNavigation(); renderGoalSummary(); renderActionSettings(); renderGraphs(); renderGoals(); renderActionButtons(); renderHints(); refreshLocalMiniStatus(); }
 
   async function init(){
-    const cfg = loadConfig();
-    el('projectUrlInput').value = cfg.projectUrl || '';
-    el('anonKeyInput').value = cfg.anonKey || '';
-    bindEvents();
-    initSafeToggle();
-    resetActionForm();
-    await bootstrapLatestState();
+    const cfg = loadConfig(); el('projectUrlInput').value = cfg.projectUrl || ''; el('anonKeyInput').value = cfg.anonKey || ''; bindEvents(); initSafeToggle(); resetActionForm(); await bootstrapLatestState();
   }
   init();
 })();
